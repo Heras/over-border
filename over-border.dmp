@@ -33,62 +33,58 @@
 00033  202A  0E 19 D0              ASL $D019 ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
 00034  202D             
 00035  202D                        ; SET TO 25 COLUMN MODE
-00036  202D  A2 1B                 LDX #%00011011
-00037  202F  8E 11 D0              STX $D011
-00038  2032                        ;LDA $D011
-00039  2032                        ;ORA #%00001000
-00040  2032                        ;STA $D011
-00041  2032             
-00042  2032                        ; SET INTERRUPT FOR 24ROWS
-00043  2032  A0 F9                 LDY #$F9     ; INTERRUPT RASTERLINE
-00044  2034  8C 12 D0              STY $D012
-00045  2037  A9 44                 LDA #<24ROWS ; INTERRUPT VECTOR
-00046  2039  8D 14 03              STA $0314
-00047  203C  A9 20                 LDA #>24ROWS
-00048  203E  8D 15 03              STA $0315
-00049  2041             
-00050  2041  4C 31 EA              JMP $EA31 ; KERNEL ROUTINE BUT SKIP SCANNING THE KEYBOARD
-00051  2044             
-00052  2044             24ROWS
-00053  2044  0E 19 D0              ASL $D019 ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
-00054  2047             
-00055  2047                        ; SET TO 24 COLUMN MODE
-00056  2047  A2 13                 LDX #%00010011
-00057  2049  8E 11 D0              STX $D011
-00058  204C                        ;LDA $D011
-00059  204C                        ;AND #%11110111
-00060  204C                        ;STA $D011
-00061  204C             
-00062  204C                        ; SET INTERRUPT FOR 24ROWS
-00063  204C  A0 33                 LDY #$33     ; INTERRUPT RASTERLINE
-00064  204E  8C 12 D0              STY $D012
-00065  2051  A9 2A                 LDA #<25ROWS ; INTERRUPT VECTOR
-00066  2053  8D 14 03              STA $0314
-00067  2056  A9 20                 LDA #>25ROWS
-00068  2058  8D 15 03              STA $0315
-00069  205B             
-00070  205B  4C 31 EA              JMP $EA31 ; KERNEL ROUTINE BUT SKIP SCANNING THE KEYBOARD
-00071  205E             
-00072  205E             
-00073  205E             
-00074  205E             
-00075  205E             
-00076  205E             
-00077  205E             
-00078  205E             
-00079  205E             
-00080  205E             
-00081  205E             
-00082  205E             
-00083  205E             
-00084  205E             
-00085  205E             
-00086  205E             
-00087  205E             
-00088  205E             
+00036  202D  AD 11 D0              LDA $D011
+00037  2030  09 08                 ORA #%00001000
+00038  2032  8D 11 D0              STA $D011
+00039  2035             
+00040  2035                        ; SET INTERRUPT FOR 24ROWS
+00041  2035  A0 F9                 LDY #$F9     ; INTERRUPT RASTERLINE
+00042  2037  8C 12 D0              STY $D012
+00043  203A  A9 47                 LDA #<24ROWS ; INTERRUPT VECTOR
+00044  203C  8D 14 03              STA $0314
+00045  203F  A9 20                 LDA #>24ROWS
+00046  2041  8D 15 03              STA $0315
+00047  2044             
+00048  2044  4C 31 EA              JMP $EA31 ; KERNEL ROUTINE BUT SKIP SCANNING THE KEYBOARD
+00049  2047             
+00050  2047             24ROWS
+00051  2047  0E 19 D0              ASL $D019 ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
+00052  204A             
+00053  204A                        ; SET TO 24 COLUMN MODE
+00054  204A  AD 11 D0              LDA $D011
+00055  204D  29 F7                 AND #%11110111
+00056  204F  8D 11 D0              STA $D011
+00057  2052             
+00058  2052                        ; SET INTERRUPT FOR 24ROWS
+00059  2052  A0 33                 LDY #$33     ; INTERRUPT RASTERLINE
+00060  2054  8C 12 D0              STY $D012
+00061  2057  A9 2A                 LDA #<25ROWS ; INTERRUPT VECTOR
+00062  2059  8D 14 03              STA $0314
+00063  205C  A9 20                 LDA #>25ROWS
+00064  205E  8D 15 03              STA $0315
+00065  2061             
+00066  2061  4C 31 EA              JMP $EA31 ; KERNEL ROUTINE BUT SKIP SCANNING THE KEYBOARD
+00067  2064             
+00068  2064             
+00069  2064             
+00070  2064             
+00071  2064             
+00072  2064             
+00073  2064             
+00074  2064             
+00075  2064             
+00076  2064             
+00077  2064             
+00078  2064             
+00079  2064             
+00080  2064             
+00081  2064             
+00082  2064             
+00083  2064             
+00084  2064             
 
 ******* 2 Label(s) *******
-24rows = $2044 
+24rows = $2047 
 25rows = $202A 
 
 ******* 0 Unused label(s) *******
