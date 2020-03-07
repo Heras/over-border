@@ -1,13 +1,45 @@
 00001  0000             *          = $2000 ; SYS 8192
 00002  2000             
-00003  2000  A5 22                 LDA $22
-00004  2002  8D 00 04              STA $0400
-00005  2005  60                    RTS
-00006  2006             
+00003  2000             
+00004  2000             INTERRUPT
+00005  2000  78                    SEI         ;TURN INTERRUPTS OFF WHILE WE DO THIS
+00006  2001  A9 7F                 LDA #$7F     ;KEEP SOME OTHER RANDOM INTERRUPTS OFF
+00007  2003  8D 0D DC              STA $DC0D
+00008  2006  8D 0D DD              STA $DD0D
+00009  2009             
+00010  2009  AD 0D DC              LDA $DC0D   ;CLEAR ANY PENDING INTERRUPTS
+00011  200C  AD 0D DD              LDA $DD0D
+00012  200F             
+00013  200F  A9 01                 LDA #$01   ;TURN ON THE RASTER INTERRUPT
+00014  2011  8D 1A D0              STA $D01A
+00015  2014             
+00016  2014  A0 AA                 LDY #$AA   ;GENERATE INTERRUPT ON FIRST LINE ON MAIN SCREEN AREA
+00017  2016  8C 12 D0              STY $D012
+00018  2019             
+00019  2019  A9 1B                 LDA #$1B  ;NOT SURE WHAT THIS DOES EXACTLY?
+00020  201B  8D 11 D0              STA $D011
+00021  201E             
+00022  201E  A9 2A                 LDA #<IRQ  ;SET THE CORRECT ADDRESS FOR THE INTERRUPT
+00023  2020  8D 14 03              STA $0314
+00024  2023  A9 20                 LDA #>IRQ
+00025  2025  8D 15 03              STA $0315
+00026  2028             
+00027  2028  58                    CLI      ;TURN ALL INTERRUPTS BACK ON
+00028  2029             
+00029  2029  60                    RTS
+00030  202A             
+00031  202A             IRQ
+00032  202A  0E 19 D0              ASL $D019 ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
+00033  202D  EE 20 D0              INC $D020 ; CHANGE BORDER COLOUR
+00034  2030  4C 81 EA              JMP $EA81 ; KERNEL ROUTINE
+00035  2033             
 
-******* 0 Label(s) *******
+******* 2 Label(s) *******
+interrupt = $2000 
+irq = $202A 
 
-******* 0 Unused label(s) *******
+******* 1 Unused label(s) *******
+interrupt
 
 ******* 1 Variable(s) *******
 tgt_c64  = $0001
