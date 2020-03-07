@@ -1,8 +1,5 @@
 *   = $2000 ; sys 8192
 
-
-
-interrupt
     sei         ; ignore interrupts
 
     ; disable all interrupts and clear pending interrupts
@@ -36,11 +33,8 @@ interrupt
    asl $d019 ; Acknowledge interrupt by clearing VICs interrupt flag
 
     ; set to 25 column mode
-    ldx #$1b
+    ldx #%00011011
     stx $d011
-    ;lda $d011
-    ;ora #%00001000
-    ;sta $d011
 
     ; set interrupt for 24rows
    ldy #$f9     ; interrupt rasterline
@@ -56,11 +50,8 @@ interrupt
    asl $d019 ; Acknowledge interrupt by clearing VICs interrupt flag
 
     ; set to 24 column mode
-    ldx #$13
+    ldx #%00010011
     stx $d011
-    ;lda $d011
-    ;and #%11110111
-    ;sta $d011
 
     ; set interrupt for 24rows
    ldy #$33     ; interrupt rasterline
