@@ -37,51 +37,51 @@
 00037  202D  A9 01                 LDA #$01
 00038  202F  8D 21 D0              STA $D021 ; CHANGE BORDER COLOUR
 00039  2032             
-00040  2032                        ; SETTING THE INTERRUPT LINE
-00041  2032  A0 F9                 LDY #$F9   ;GENERATE INTERRUPT ON FIRST LINE ON MAIN SCREEN AREA
-00042  2034  8C 12 D0              STY $D012  ; WRITE: LINE TO COMPARE FOR RASTER INTERRUPT
-00043  2037  A9 1B                 LDA #$1B  ;CLEAR HIGH ORDER BIT OF THE RASTER INTERRUPT COMPARE. VERY NAIVE
-00044  2039  8D 11 D0              STA $D011
-00045  203C             
-00046  203C                        ; SET THE INTERRUPT VECTOR
-00047  203C  A9 49                 LDA #<BLACK  ;SET THE CORRECT ADDRESS FOR THE INTERRUPT
-00048  203E  8D 14 03              STA $0314
-00049  2041  A9 20                 LDA #>BLACK
-00050  2043  8D 15 03              STA $0315
-00051  2046             
-00052  2046             
-00053  2046  4C 31 EA              JMP $EA31 ; KERNEL ROUTINE BUT SKIP SCANNING THE KEYBOARD
-00054  2049             
-00055  2049             
-00056  2049             BLACK
-00057  2049  0E 19 D0              ASL $D019 ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
-00058  204C  A9 00                 LDA #$00
-00059  204E  8D 21 D0              STA $D021 ; CHANGE BORDER COLOUR
-00060  2051             
-00061  2051                        ; SETTING THE INTERRUPT LINE
-00062  2051  A0 33                 LDY #$33   ;GENERATE INTERRUPT ON FIRST LINE ON MAIN SCREEN AREA
-00063  2053  8C 12 D0              STY $D012  ; WRITE: LINE TO COMPARE FOR RASTER INTERRUPT
-00064  2056  A9 1B                 LDA #$1B  ;CLEAR HIGH ORDER BIT OF THE RASTER INTERRUPT COMPARE. VERY NAIVE
-00065  2058  8D 11 D0              STA $D011
-00066  205B             
-00067  205B                        ; SET THE INTERRUPT VECTOR
-00068  205B  A9 2A                 LDA #<WHITE  ;SET THE CORRECT ADDRESS FOR THE INTERRUPT
-00069  205D  8D 14 03              STA $0314
-00070  2060  A9 20                 LDA #>WHITE
-00071  2062  8D 15 03              STA $0315
-00072  2065             
-00073  2065  4C 31 EA              JMP $EA31 ; KERNEL ROUTINE BUT SKIP SCANNING THE KEYBOARD
-00074  2068             
-00075  2068             
-00076  2068             
-00077  2068             
-00078  2068             
-00079  2068             
-00080  2068             
-00081  2068             
-00082  2068             
-00083  2068             
-00084  2068             
+00040  2032                        ; SET TO 25 COLUMN MODE
+00041  2032  A2 1B                 LDX #$1B       ;
+00042  2034  8E 11 D0              STX $D011
+00043  2037                        ;LDA $D011
+00044  2037                        ;ORA #%00001000
+00045  2037                        ;STA $D011
+00046  2037             
+00047  2037                        ; SETTING THE INTERRUPT LINE
+00048  2037  A0 F9                 LDY #$F9   ;GENERATE INTERRUPT ON FIRST LINE ON MAIN SCREEN AREA
+00049  2039  8C 12 D0              STY $D012  ; WRITE: LINE TO COMPARE FOR RASTER INTERRUPT
+00050  203C             
+00051  203C                        ; SET THE INTERRUPT VECTOR
+00052  203C  A9 49                 LDA #<BLACK  ;SET THE CORRECT ADDRESS FOR THE INTERRUPT
+00053  203E  8D 14 03              STA $0314
+00054  2041  A9 20                 LDA #>BLACK
+00055  2043  8D 15 03              STA $0315
+00056  2046             
+00057  2046             
+00058  2046  4C 31 EA              JMP $EA31 ; KERNEL ROUTINE BUT SKIP SCANNING THE KEYBOARD
+00059  2049             
+00060  2049             
+00061  2049             BLACK
+00062  2049  0E 19 D0              ASL $D019 ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
+00063  204C  A9 00                 LDA #$00
+00064  204E  8D 21 D0              STA $D021 ; CHANGE BORDER COLOUR
+00065  2051             
+00066  2051             
+00067  2051                        ; SET TO 24 COLUMN MODE
+00068  2051  A2 13                 LDX #$13       ;
+00069  2053  8E 11 D0              STX $D011
+00070  2056                        ;LDA $D011
+00071  2056                        ;AND #%11110111
+00072  2056                        ;STA $D011
+00073  2056             
+00074  2056                        ; SETTING THE INTERRUPT LINE
+00075  2056  A0 33                 LDY #$33   ;GENERATE INTERRUPT ON FIRST LINE ON MAIN SCREEN AREA
+00076  2058  8C 12 D0              STY $D012  ; WRITE: LINE TO COMPARE FOR RASTER INTERRUPT
+00077  205B             
+00078  205B                        ; SET THE INTERRUPT VECTOR
+00079  205B  A9 2A                 LDA #<WHITE  ;SET THE CORRECT ADDRESS FOR THE INTERRUPT
+00080  205D  8D 14 03              STA $0314
+00081  2060  A9 20                 LDA #>WHITE
+00082  2062  8D 15 03              STA $0315
+00083  2065             
+00084  2065  4C 31 EA              JMP $EA31 ; KERNEL ROUTINE BUT SKIP SCANNING THE KEYBOARD
 00085  2068             
 00086  2068             
 00087  2068             
@@ -89,6 +89,17 @@
 00089  2068             
 00090  2068             
 00091  2068             
+00092  2068             
+00093  2068             
+00094  2068             
+00095  2068             
+00096  2068             
+00097  2068             
+00098  2068             
+00099  2068             
+00100  2068             
+00101  2068             
+00102  2068             
 
 ******* 3 Label(s) *******
 black = $2049 

@@ -37,11 +37,16 @@ white
     lda #$01
     sta $d021 ; Change border colour
 
+    ; set to 25 column mode
+    ldx #$1b       ;
+        stx $d011
+    ;lda $d011
+    ;ora #%00001000
+    ;sta $d011
+
     ; setting the interrupt line
    ldy #$f9   ;generate interrupt on first line on main screen area
    sty $d012  ; write: line to compare for raster interrupt
-   lda #$1b  ;clear high order bit of the raster interrupt compare. very naive
-   sta $d011
 
     ; set the interrupt vector
    lda #<black  ;set the correct address for the interrupt
@@ -58,11 +63,17 @@ black
     lda #$00
     sta $d021 ; Change border colour
 
+
+    ; set to 24 column mode
+        ldx #$13       ;
+        stx $d011
+    ;lda $d011
+    ;and #%11110111
+    ;sta $d011
+
     ; setting the interrupt line
    ldy #$33   ;generate interrupt on first line on main screen area
    sty $d012  ; write: line to compare for raster interrupt
-   lda #$1b  ;clear high order bit of the raster interrupt compare. very naive
-   sta $d011
 
     ; set the interrupt vector
    lda #<white  ;set the correct address for the interrupt
