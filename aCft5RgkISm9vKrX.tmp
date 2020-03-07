@@ -3,22 +3,24 @@
 *   = $2000 ; sys 8192
 
 
-interrupt
-    sei         ;turn interrupts off while we do this
-    lda #$7f     ;keep some other random interrupts off
-    sta $dc0d
-    sta $dd0d
 
-   lda $dc0d   ;clear any pending interrupts
-   lda $dd0d
+interrupt
+    sei         ; ignore interrupts
+
+    lda #%0111111    
+    sta $dc0d ; interrupt control register CIA #1
+    sta $dd0d ; interrupt control register CIA#2
+
+   lda $dc0d   ;clear any pending interrupts CIA#1
+   lda $dd0d    ; clear any pending interrupts CIA#2
 
    lda #$01   ;turn on the raster interrupt
-   sta $d01a
+   sta $d01a  ; irq mask register
 
    ldy #$aa   ;generate interrupt on first line on main screen area
-   sty $d012
+   sty $d012  ; write: line to compare for raster interrupt
 
-   lda #$1b  ;Not sure what this does exactly?
+   lda #$1b  ;clear high order bit of the raster interrupt compare. very naive
    sta $d011
 
    lda #<irq  ;set the correct address for the interrupt
@@ -26,7 +28,7 @@ interrupt
    lda #>irq
    sta $0315
 
-   cli      ;turn all interrupts back on
+   cli      ; enable interrupts 
 
     rts
 
