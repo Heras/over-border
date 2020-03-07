@@ -24,61 +24,50 @@ interrupt
    sta $d011
 
     ; set the interrupt vector
-   lda #<white  ;set the correct address for the interrupt
+   lda #<25rows  ;set the correct address for the interrupt
    sta $0314
-   lda #>white
+   lda #>25rows
    sta $0315
 
    cli      ; enable interrupts 
     rts
 
-white
+25rows
    asl $d019 ; Acknowledge interrupt by clearing VICs interrupt flag
-    lda #$01
-    sta $d021 ; Change border colour
 
     ; set to 25 column mode
-    ldx #$1b       ;
-        stx $d011
+    ldx #$1b
+    stx $d011
     ;lda $d011
     ;ora #%00001000
     ;sta $d011
 
-    ; setting the interrupt line
-   ldy #$f9   ;generate interrupt on first line on main screen area
-   sty $d012  ; write: line to compare for raster interrupt
-
-    ; set the interrupt vector
-   lda #<black  ;set the correct address for the interrupt
+    ; set interrupt for 24rows
+   ldy #$f9     ; interrupt rasterline
+   sty $d012
+   lda #<24rows ; interrupt vector
    sta $0314
-   lda #>black
+   lda #>24rows
    sta $0315
-
 
    jmp $ea31 ; Kernel routine but skip scanning the keyboard
 
-
-black
+24rows
    asl $d019 ; Acknowledge interrupt by clearing VICs interrupt flag
-    lda #$00
-    sta $d021 ; Change border colour
-
 
     ; set to 24 column mode
-        ldx #$13       ;
-        stx $d011
+    ldx #$13
+    stx $d011
     ;lda $d011
     ;and #%11110111
     ;sta $d011
 
-    ; setting the interrupt line
-   ldy #$33   ;generate interrupt on first line on main screen area
-   sty $d012  ; write: line to compare for raster interrupt
-
-    ; set the interrupt vector
-   lda #<white  ;set the correct address for the interrupt
+    ; set interrupt for 24rows
+   ldy #$33     ; interrupt rasterline
+   sty $d012
+   lda #<25rows ; interrupt vector
    sta $0314
-   lda #>white
+   lda #>25rows
    sta $0315
 
    jmp $ea31 ; Kernel routine but skip scanning the keyboard
