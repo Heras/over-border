@@ -1,91 +1,117 @@
-00001  0000             *          = $2000 ; SYS 8192
-00002  2000             
-00003  2000  78                    SEI         ; IGNORE INTERRUPTS
-00004  2001             
-00005  2001                        ; DISABLE ALL INTERRUPTS AND CLEAR PENDING INTERRUPTS
-00006  2001  A9 3F                 LDA #%0111111
-00007  2003  8D 0D DC              STA $DC0D ; INTERRUPT CONTROL REGISTER CIA #1
-00008  2006  8D 0D DD              STA $DD0D ; INTERRUPT CONTROL REGISTER CIA#2
-00009  2009             
-00010  2009  AD 0D DC              LDA $DC0D   ;CLEAR ANY PENDING INTERRUPTS CIA#1 BY READING
-00011  200C  AD 0D DD              LDA $DD0D    ; CLEAR ANY PENDING INTERRUPTS CIA#2 BY READING
-00012  200F             
-00013  200F                        ; ENABLE RASTER INTERRUPT
-00014  200F  A9 01                 LDA #%00000001   ;TURN ON THE RASTER INTERRUPT
-00015  2011  8D 1A D0              STA $D01A  ; IRQ MASK REGISTER
-00016  2014             
-00017  2014                        ; SETTING THE INTERRUPT LINE
-00018  2014  A0 33                 LDY #$33   ;GENERATE INTERRUPT ON FIRST LINE ON MAIN SCREEN AREA
-00019  2016  8C 12 D0              STY $D012  ; WRITE: LINE TO COMPARE FOR RASTER INTERRUPT
-00020  2019  A9 1B                 LDA #$1B  ;CLEAR HIGH ORDER BIT OF THE RASTER INTERRUPT COMPARE. VERY NAIVE
-00021  201B  8D 11 D0              STA $D011
-00022  201E             
-00023  201E                        ; SET THE INTERRUPT VECTOR
-00024  201E  A9 2A                 LDA #<25ROWS  ;SET THE CORRECT ADDRESS FOR THE INTERRUPT
-00025  2020  8D 14 03              STA $0314
-00026  2023  A9 20                 LDA #>25ROWS
-00027  2025  8D 15 03              STA $0315
-00028  2028             
-00029  2028  58                    CLI      ; ENABLE INTERRUPTS
-00030  2029  60                    RTS
-00031  202A             
-00032  202A             25ROWS
-00033  202A  0E 19 D0              ASL $D019 ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
-00034  202D             
-00035  202D                        ; SET TO 25 COLUMN MODE
-00036  202D  AD 11 D0              LDA $D011
-00037  2030  09 08                 ORA #%00001000
-00038  2032  8D 11 D0              STA $D011
-00039  2035             
-00040  2035                        ; SET INTERRUPT FOR 24ROWS
-00041  2035  A0 F9                 LDY #$F9     ; INTERRUPT RASTERLINE
-00042  2037  8C 12 D0              STY $D012
-00043  203A  A9 47                 LDA #<24ROWS ; INTERRUPT VECTOR
-00044  203C  8D 14 03              STA $0314
-00045  203F  A9 20                 LDA #>24ROWS
-00046  2041  8D 15 03              STA $0315
-00047  2044             
-00048  2044  4C 31 EA              JMP $EA31 ; KERNEL ROUTINE BUT SKIP SCANNING THE KEYBOARD
-00049  2047             
-00050  2047             24ROWS
-00051  2047  0E 19 D0              ASL $D019 ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
-00052  204A             
-00053  204A                        ; SET TO 24 COLUMN MODE
-00054  204A  AD 11 D0              LDA $D011
-00055  204D  29 F7                 AND #%11110111
-00056  204F  8D 11 D0              STA $D011
-00057  2052             
-00058  2052                        ; SET INTERRUPT FOR 24ROWS
-00059  2052  A0 33                 LDY #$33     ; INTERRUPT RASTERLINE
-00060  2054  8C 12 D0              STY $D012
-00061  2057  A9 2A                 LDA #<25ROWS ; INTERRUPT VECTOR
-00062  2059  8D 14 03              STA $0314
-00063  205C  A9 20                 LDA #>25ROWS
-00064  205E  8D 15 03              STA $0315
-00065  2061             
-00066  2061  4C 31 EA              JMP $EA31 ; KERNEL ROUTINE BUT SKIP SCANNING THE KEYBOARD
-00067  2064             
-00068  2064             
-00069  2064             
-00070  2064             
-00071  2064             
-00072  2064             
-00073  2064             
-00074  2064             
-00075  2064             
-00076  2064             
-00077  2064             
-00078  2064             
-00079  2064             
-00080  2064             
-00081  2064             
-00082  2064             
-00083  2064             
-00084  2064             
+00001  0000             *=$C000    ; 49152
+00002  C000             
+00003  C000             
+00004  C000                        ; SET SPRITE LOCATION TO 832
+00005  C000  A9 0D                 LDA #$0D
+00006  C002  8D F8 07              STA $07F8
+00007  C005             
+00008  C005                        ; SET X
+00009  C005  A9 18                 LDA #$18
+00010  C007  8D 00 D0              STA $D000
+00011  C00A             
+00012  C00A                        ; SET Y
+00013  C00A  A9 08                 LDA #$08
+00014  C00C  8D 01 D0              STA $D001
+00015  C00F             
+00016  C00F                        ; SET COLOR
+00017  C00F  A9 0E                 LDA #$0E
+00018  C011  8D 27 D0              STA $D027
+00019  C014             
+00020  C014                        ; DOUBLE SIZE
+00021  C014  A9 FF                 LDA #$FF
+00022  C016  8D 17 D0              STA $D017
+00023  C019  8D 1D D0              STA $D01D
+00024  C01C             
+00025  C01C                        ; FILL SPRITE DATA
+00026  C01C             ;FOR N=0 TO 62:POKE832+N,255:NEXT
+00027  C01C             
+00028  C01C             
+00029  C01C                        ; ENABLE ALL SPRITES
+00030  C01C  A9 FF                 LDA #$FF
+00031  C01E  8D 15 D0              STA $D015
+00032  C021             
+00033  C021  78                    SEI         ; IGNORE INTERRUPTS
+00034  C022             
+00035  C022                        ; DISABLE ALL INTERRUPTS AND CLEAR PENDING INTERRUPTS
+00036  C022  A9 3F                 LDA #%0111111
+00037  C024  8D 0D DC              STA $DC0D ; INTERRUPT CONTROL REGISTER CIA #1
+00038  C027  8D 0D DD              STA $DD0D ; INTERRUPT CONTROL REGISTER CIA#2
+00039  C02A             
+00040  C02A  AD 0D DC              LDA $DC0D   ;CLEAR ANY PENDING INTERRUPTS CIA#1 BY READING
+00041  C02D  AD 0D DD              LDA $DD0D    ; CLEAR ANY PENDING INTERRUPTS CIA#2 BY READING
+00042  C030             
+00043  C030                        ; ENABLE RASTER INTERRUPT
+00044  C030  A9 01                 LDA #%00000001   ;TURN ON THE RASTER INTERRUPT
+00045  C032  8D 1A D0              STA $D01A  ; IRQ MASK REGISTER
+00046  C035             
+00047  C035                        ; SETTING THE INTERRUPT LINE
+00048  C035  A0 33                 LDY #$33   ;GENERATE INTERRUPT ON FIRST LINE ON MAIN SCREEN AREA
+00049  C037  8C 12 D0              STY $D012  ; WRITE: LINE TO COMPARE FOR RASTER INTERRUPT
+00050  C03A  A9 1B                 LDA #$1B  ;CLEAR HIGH ORDER BIT OF THE RASTER INTERRUPT COMPARE. VERY NAIVE
+00051  C03C  8D 11 D0              STA $D011
+00052  C03F             
+00053  C03F                        ; SET THE INTERRUPT VECTOR
+00054  C03F  A9 4B                 LDA #<25ROWS  ;SET THE CORRECT ADDRESS FOR THE INTERRUPT
+00055  C041  8D 14 03              STA $0314
+00056  C044  A9 C0                 LDA #>25ROWS
+00057  C046  8D 15 03              STA $0315
+00058  C049             
+00059  C049  58                    CLI      ; ENABLE INTERRUPTS
+00060  C04A  60                    RTS
+00061  C04B             
+00062  C04B             25ROWS
+00063  C04B             
+00064  C04B                        ; SET TO 25 COLUMN MODE
+00065  C04B  AD 11 D0              LDA $D011
+00066  C04E  09 08                 ORA #%00001000
+00067  C050  8D 11 D0              STA $D011
+00068  C053             
+00069  C053                        ; REGISTER INTERRUPT FOR 24ROWS
+00070  C053  A0 F9                 LDY #$F9     ; RASTERLINE
+00071  C055  8C 12 D0              STY $D012
+00072  C058  A9 68                 LDA #<24ROWS ; VECTOR
+00073  C05A  8D 14 03              STA $0314
+00074  C05D  A9 C0                 LDA #>24ROWS
+00075  C05F  8D 15 03              STA $0315
+00076  C062             
+00077  C062  0E 19 D0              ASL $D019 ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
+00078  C065             
+00079  C065  4C 31 EA              JMP $EA31 ; KERNEL ROUTINE INCLUDING SCANNING THE KEYBOARD
+00080  C068             
+00081  C068             24ROWS
+00082  C068             
+00083  C068                        ; SET TO 24 COLUMN MODE
+00084  C068  AD 11 D0              LDA $D011
+00085  C06B  29 F7                 AND #%11110111
+00086  C06D  8D 11 D0              STA $D011
+00087  C070             
+00088  C070                        ; REGISTER INTERRUPT FOR 25ROWS
+00089  C070  A0 33                 LDY #$33     ; RASTERLINE
+00090  C072  8C 12 D0              STY $D012
+00091  C075  A9 4B                 LDA #<25ROWS ; VECTOR
+00092  C077  8D 14 03              STA $0314
+00093  C07A  A9 C0                 LDA #>25ROWS
+00094  C07C  8D 15 03              STA $0315
+00095  C07F             
+00096  C07F  0E 19 D0              ASL $D019 ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
+00097  C082             
+00098  C082  4C 31 EA              JMP $EA31 ; KERNEL ROUTINE INCLUDING SCANNING THE KEYBOARD
+00099  C085             
+00100  C085             
+00101  C085             
+00102  C085             
+00103  C085             
+00104  C085             
+00105  C085             
+00106  C085             
+00107  C085             
+00108  C085             
+00109  C085             
+00110  C085             
 
 ******* 2 Label(s) *******
-24rows = $2047 
-25rows = $202A 
+24rows = $C068 
+25rows = $C04B 
 
 ******* 0 Unused label(s) *******
 

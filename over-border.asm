@@ -1,4 +1,34 @@
-*   = $2000 ; sys 8192
+*=$c000                 ; 49152 
+
+
+    ; set sprite location to 832
+    lda #$0d
+    sta $07f8
+
+    ; set x
+    lda #$18
+    sta $d000
+
+    ; set y
+    lda #$08
+    sta $d001
+
+    ; set color
+    lda #$0e
+    sta $D027
+
+    ; double size
+    lda #$ff
+    sta $d017
+    sta $d01d
+
+    ; fill sprite data
+;for n=0 to 62:poke832+n,255:next
+
+
+    ; enable all sprites
+    lda #$ff
+    sta $d015
 
     sei         ; ignore interrupts
 
@@ -30,46 +60,42 @@
     rts
 
 25rows
-   asl $d019 ; Acknowledge interrupt by clearing VICs interrupt flag
 
     ; set to 25 column mode
     lda $d011
     ora #%00001000
     sta $d011
 
-    ; set interrupt for 24rows
-   ldy #$f9     ; interrupt rasterline
+    ; register interrupt for 24rows
+   ldy #$f9     ; rasterline
    sty $d012
-   lda #<24rows ; interrupt vector
+   lda #<24rows ; vector
    sta $0314
    lda #>24rows
    sta $0315
 
-   jmp $ea31 ; Kernel routine but skip scanning the keyboard
+   asl $d019 ; Acknowledge interrupt by clearing VICs interrupt flag
+
+   jmp $ea31 ; Kernel routine including scanning the keyboard
 
 24rows
-   asl $d019 ; Acknowledge interrupt by clearing VICs interrupt flag
 
     ; set to 24 column mode
     lda $d011
     and #%11110111
     sta $d011
 
-    ; set interrupt for 24rows
-   ldy #$33     ; interrupt rasterline
+    ; register interrupt for 25rows
+   ldy #$33     ; rasterline
    sty $d012
-   lda #<25rows ; interrupt vector
+   lda #<25rows ; vector
    sta $0314
    lda #>25rows
    sta $0315
 
-   jmp $ea31 ; Kernel routine but skip scanning the keyboard
+   asl $d019 ; Acknowledge interrupt by clearing VICs interrupt flag
 
-
-
-
-
-
+   jmp $ea31 ; Kernel routine including scanning the keyboard
 
 
 
