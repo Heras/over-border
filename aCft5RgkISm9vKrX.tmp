@@ -140,6 +140,8 @@ loop
    lda #>25rows
    sta $0315
 
+    dec $d001    ; sprite 0
+
    asl $d019 ; Acknowledge interrupt by clearing VICs interrupt flag
 
    jmp $ea31 ; Kernel routine including scanning the keyboard

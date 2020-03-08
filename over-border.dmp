@@ -138,21 +138,23 @@
 00138  C0EF  A9 C0                 LDA #>25ROWS
 00139  C0F1  8D 15 03              STA $0315
 00140  C0F4             
-00141  C0F4  0E 19 D0              ASL $D019 ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
+00141  C0F4  CE 01 D0              DEC $D001    ; SPRITE 0
 00142  C0F7             
-00143  C0F7  4C 31 EA              JMP $EA31 ; KERNEL ROUTINE INCLUDING SCANNING THE KEYBOARD
+00143  C0F7  0E 19 D0              ASL $D019 ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
 00144  C0FA             
-00145  C0FA             
-00146  C0FA             
-00147  C0FA             
-00148  C0FA             
-00149  C0FA             
-00150  C0FA             
-00151  C0FA             
-00152  C0FA             
-00153  C0FA             
-00154  C0FA             
-00155  C0FA             
+00145  C0FA  4C 31 EA              JMP $EA31 ; KERNEL ROUTINE INCLUDING SCANNING THE KEYBOARD
+00146  C0FD             
+00147  C0FD             
+00148  C0FD             
+00149  C0FD             
+00150  C0FD             
+00151  C0FD             
+00152  C0FD             
+00153  C0FD             
+00154  C0FD             
+00155  C0FD             
+00156  C0FD             
+00157  C0FD             
 
 ******* 3 Label(s) *******
 24rows = $C0DD 
