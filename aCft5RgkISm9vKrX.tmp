@@ -1,6 +1,6 @@
 ##{0:0:0:over-border.prg}C:\Users\joepg\OneDrive\c64\over-border\over-border\over-border.asm
 
-*=$c000                 ; 49152
+*=49152
 
         jsr initialize_sprites
         jsr initialize_raster_interrupts
@@ -12,27 +12,27 @@ initialize_raster_interrupts
 
         ; disable all interrupts and clear pending interrupts
         lda #%0111111 
-        sta $dc0d     ; interrupt control register CIA #1
-        sta $dd0d     ; interrupt control register CIA#2
+        sta 56333     ; interrupt control register CIA #1
+        sta 56589     ; interrupt control register CIA#2
 
-        lda $dc0d     ;clear any pending interrupts CIA#1 by reading
-        lda $dd0d     ; clear any pending interrupts CIA#2 by reading
+        lda 56333     ;clear any pending interrupts CIA#1 by reading
+        lda 56589     ; clear any pending interrupts CIA#2 by reading
 
         ; enable raster interrupt
         lda #%00000001;turn on the raster interrupt
-        sta $d01a     ; irq mask register
+        sta 53274     ; irq mask register
 
         ; setting the interrupt line
-        ldy #$00      ; generate interrupt on first line on main screen area
-        sty $d012     ; write: line to compare for raster interrupt
-        lda #$1b      ; clear high order bit of the raster interrupt compare. very naive
-        sta $d011     
+        ldy #00      ; generate interrupt on first line on main screen area
+        sty 53266     ; write: line to compare for raster interrupt
+        lda #27      ; clear high order bit of the raster interrupt compare. very naive
+        sta 53265     
 
         ; set the interrupt vector
         lda #<rasterline_000_00  ; set the correct address for the interrupt
-        sta $0314     
+        sta 788     
         lda #>rasterline_000_00  
-        sta $0315     
+        sta 789     
 
         cli           ; enable interrupts
         rts
@@ -129,8 +129,8 @@ rasterline_000_00
         dec $d001     
 
         ; register next raster
-        ldy #$f9      ; rasterline
-        sty $d012     
+        ldy #249      ; rasterline
+        sty 53266   
         lda #<rasterline_249_f9  ; vector
         sta $0314     
         lda #>rasterline_249_f9  
