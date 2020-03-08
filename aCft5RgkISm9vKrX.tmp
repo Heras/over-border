@@ -23,15 +23,15 @@ initialize_raster_interrupts
         sta $d01a     ; irq mask register
 
         ; setting the interrupt line
-        ldy #$33      ; generate interrupt on first line on main screen area
+        ldy #$00      ; generate interrupt on first line on main screen area
         sty $d012     ; write: line to compare for raster interrupt
         lda #$1b      ; clear high order bit of the raster interrupt compare. very naive
         sta $d011     
 
         ; set the interrupt vector
-        lda #<rasterline_051_33  ; set the correct address for the interrupt
+        lda #<rasterline_000_00  ; set the correct address for the interrupt
         sta $0314     
-        lda #>rasterline_051_33  
+        lda #>rasterline_000_00  
         sta $0315     
 
         cli           ; enable interrupts
@@ -127,18 +127,6 @@ rasterline_000_00
         sta $d00b     ; sprite 5
         sta $d00d     ; sprite 6
         sta $d00f     ; sprite 7
-
-        ; register next raster
-        ldy #$33      ; rasterline
-        sty $d012     
-        lda #<rasterline_051_33  ; vector
-        sta $0314     
-        lda #>rasterline_051_33  
-        sta $0315     
-        asl $d019     ; Acknowledge interrupt by clearing VICs interrupt flag
-        jmp $ea31     ; Kernel routine including scanning the keyboard
-
-rasterline_051_33
 
         ; register next raster
         ldy #$f9      ; rasterline

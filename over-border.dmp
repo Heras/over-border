@@ -21,15 +21,15 @@
 00021  C018  8D 1A D0              STA $D01A     ; IRQ MASK REGISTER
 00022  C01B             
 00023  C01B                        ; SETTING THE INTERRUPT LINE
-00024  C01B  A0 33                 LDY #$33      ; GENERATE INTERRUPT ON FIRST LINE ON MAIN SCREEN AREA
+00024  C01B  A0 00                 LDY #$00      ; GENERATE INTERRUPT ON FIRST LINE ON MAIN SCREEN AREA
 00025  C01D  8C 12 D0              STY $D012     ; WRITE: LINE TO COMPARE FOR RASTER INTERRUPT
 00026  C020  A9 1B                 LDA #$1B      ; CLEAR HIGH ORDER BIT OF THE RASTER INTERRUPT COMPARE. VERY NAIVE
 00027  C022  8D 11 D0              STA $D011
 00028  C025             
 00029  C025                        ; SET THE INTERRUPT VECTOR
-00030  C025  A9 E8                 LDA #<RASTERLINE_051_33  ; SET THE CORRECT ADDRESS FOR THE INTERRUPT
+00030  C025  A9 B1                 LDA #<RASTERLINE_000_00  ; SET THE CORRECT ADDRESS FOR THE INTERRUPT
 00031  C027  8D 14 03              STA $0314
-00032  C02A  A9 C0                 LDA #>RASTERLINE_051_33
+00032  C02A  A9 C0                 LDA #>RASTERLINE_000_00
 00033  C02C  8D 15 03              STA $0315
 00034  C02F             
 00035  C02F  58                    CLI           ; ENABLE INTERRUPTS
@@ -127,63 +127,50 @@
 00127  C0D0  8D 0F D0              STA $D00F     ; SPRITE 7
 00128  C0D3             
 00129  C0D3                        ; REGISTER NEXT RASTER
-00130  C0D3  A0 33                 LDY #$33      ; RASTERLINE
+00130  C0D3  A0 F9                 LDY #$F9      ; RASTERLINE
 00131  C0D5  8C 12 D0              STY $D012
-00132  C0D8  A9 E8                 LDA #<RASTERLINE_051_33  ; VECTOR
+00132  C0D8  A9 E8                 LDA #<RASTERLINE_249_F9  ; VECTOR
 00133  C0DA  8D 14 03              STA $0314
-00134  C0DD  A9 C0                 LDA #>RASTERLINE_051_33
+00134  C0DD  A9 C0                 LDA #>RASTERLINE_249_F9
 00135  C0DF  8D 15 03              STA $0315
 00136  C0E2  0E 19 D0              ASL $D019     ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
 00137  C0E5  4C 31 EA              JMP $EA31     ; KERNEL ROUTINE INCLUDING SCANNING THE KEYBOARD
 00138  C0E8             
-00139  C0E8             RASTERLINE_051_33 
+00139  C0E8             RASTERLINE_249_F9 
 00140  C0E8             
-00141  C0E8                        ; REGISTER NEXT RASTER
-00142  C0E8  A0 F9                 LDY #$F9      ; RASTERLINE
-00143  C0EA  8C 12 D0              STY $D012
-00144  C0ED  A9 FD                 LDA #<RASTERLINE_249_F9  ; VECTOR
-00145  C0EF  8D 14 03              STA $0314
-00146  C0F2  A9 C0                 LDA #>RASTERLINE_249_F9
-00147  C0F4  8D 15 03              STA $0315
-00148  C0F7  0E 19 D0              ASL $D019     ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
-00149  C0FA  4C 31 EA              JMP $EA31     ; KERNEL ROUTINE INCLUDING SCANNING THE KEYBOARD
-00150  C0FD             
-00151  C0FD             RASTERLINE_249_F9 
-00152  C0FD             
-00153  C0FD                        ; SET TO 24 COLUMN MODE
-00154  C0FD  AD 11 D0              LDA $D011
-00155  C100  29 F7                 AND #%11110111
-00156  C102  8D 11 D0              STA $D011
-00157  C105             
-00158  C105                        ; PUT ALL SPRITES IN THE BOTTOM BORDER
-00159  C105  A9 FA                 LDA #$FA
-00160  C107  8D 03 D0              STA $D003     ; SPRITE 1
-00161  C10A  8D 05 D0              STA $D005     ; SPRITE 2
-00162  C10D  8D 07 D0              STA $D007     ; SPRITE 3
-00163  C110  8D 09 D0              STA $D009     ; SPRITE 4
-00164  C113  8D 0B D0              STA $D00B     ; SPRITE 5
-00165  C116  8D 0D D0              STA $D00D     ; SPRITE 6
-00166  C119  8D 0F D0              STA $D00F     ; SPRITE 7
-00167  C11C             
-00168  C11C                        ; REGISTER NEXT RASTER
-00169  C11C  A0 00                 LDY #$00      ; RASTERLINE
-00170  C11E  8C 12 D0              STY $D012
-00171  C121  A9 B1                 LDA #<RASTERLINE_000_00  ; VECTOR
-00172  C123  8D 14 03              STA $0314
-00173  C126  A9 C0                 LDA #>RASTERLINE_000_00
-00174  C128  8D 15 03              STA $0315
-00175  C12B  0E 19 D0              ASL $D019     ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
-00176  C12E  4C 31 EA              JMP $EA31     ; KERNEL ROUTINE INCLUDING SCANNING THE KEYBOARD
-00177  C131             
-00178  C131             
+00141  C0E8                        ; SET TO 24 COLUMN MODE
+00142  C0E8  AD 11 D0              LDA $D011
+00143  C0EB  29 F7                 AND #%11110111
+00144  C0ED  8D 11 D0              STA $D011
+00145  C0F0             
+00146  C0F0                        ; PUT ALL SPRITES IN THE BOTTOM BORDER
+00147  C0F0  A9 FA                 LDA #$FA
+00148  C0F2  8D 03 D0              STA $D003     ; SPRITE 1
+00149  C0F5  8D 05 D0              STA $D005     ; SPRITE 2
+00150  C0F8  8D 07 D0              STA $D007     ; SPRITE 3
+00151  C0FB  8D 09 D0              STA $D009     ; SPRITE 4
+00152  C0FE  8D 0B D0              STA $D00B     ; SPRITE 5
+00153  C101  8D 0D D0              STA $D00D     ; SPRITE 6
+00154  C104  8D 0F D0              STA $D00F     ; SPRITE 7
+00155  C107             
+00156  C107                        ; REGISTER NEXT RASTER
+00157  C107  A0 00                 LDY #$00      ; RASTERLINE
+00158  C109  8C 12 D0              STY $D012
+00159  C10C  A9 B1                 LDA #<RASTERLINE_000_00  ; VECTOR
+00160  C10E  8D 14 03              STA $0314
+00161  C111  A9 C0                 LDA #>RASTERLINE_000_00
+00162  C113  8D 15 03              STA $0315
+00163  C116  0E 19 D0              ASL $D019     ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
+00164  C119  4C 31 EA              JMP $EA31     ; KERNEL ROUTINE INCLUDING SCANNING THE KEYBOARD
+00165  C11C             
+00166  C11C             
 
-******* 6 Label(s) *******
+******* 5 Label(s) *******
 initialize_raster_interrupts = $C007 
 initialize_sprites = $C031 
 loop_sprite_data = $C0A5 
 rasterline_000_00 = $C0B1 
-rasterline_051_33 = $C0E8 
-rasterline_249_f9 = $C0FD 
+rasterline_249_f9 = $C0E8 
 
 ******* 2 Unused label(s) *******
 initialize_raster_interrupts
