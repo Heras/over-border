@@ -6,6 +6,11 @@
     sta $07f8   ; sprite 0
     sta $07f9   ; sprite 1
     sta $07fa   ; sprite 2
+    sta $07fa   ; sprite 3
+    sta $07fa   ; sprite 4
+    sta $07fa   ; sprite 5
+    sta $07fa   ; sprite 6
+    sta $07fa   ; sprite 7
 
     ; set x
     lda #$99
@@ -14,6 +19,20 @@
     sta $d002    ; sprite 1
     lda #$48
     sta $d004    ; sprite 2
+    lda #$78
+    sta $d006    ; sprite 3
+    lda #$a8
+    sta $d008    ; sprite 4
+    lda #$d8
+    sta $d00a    ; sprite 5
+    lda #$08
+    sta $d00c    ; sprite 6
+    lda #$38
+    sta $d00e    ; sprite 7
+
+    ; set most significant bit for last two sprites
+    lda #$c0;
+    sta $d010
 
     ; set y
     lda #$99
@@ -21,6 +40,11 @@
     lda #$08
     sta $d003    ; sprite 1
     sta $d005    ; sprite 2
+    sta $d007    ; sprite 3
+    sta $d009    ; sprite 4
+    sta $d00b    ; sprite 5
+    sta $d00d    ; sprite 6
+    sta $d00f    ; sprite 7
 
     ; set color
     lda #$01
@@ -28,6 +52,11 @@
     lda #$0e
     sta $D028    ; sprite 1
     sta $D029    ; sprite 2
+    sta $D02a    ; sprite 3
+    sta $D02b    ; sprite 4
+    sta $D02c    ; sprite 5
+    sta $D02d    ; sprite 5
+    sta $D02e    ; sprite 5
 
     ; double size
     lda #$ff

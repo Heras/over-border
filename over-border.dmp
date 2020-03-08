@@ -6,129 +6,158 @@
 00006  C002  8D F8 07              STA $07F8   ; SPRITE 0
 00007  C005  8D F9 07              STA $07F9   ; SPRITE 1
 00008  C008  8D FA 07              STA $07FA   ; SPRITE 2
-00009  C00B             
-00010  C00B                        ; SET X
-00011  C00B  A9 99                 LDA #$99
-00012  C00D  8D 00 D0              STA $D000    ; SPRITE 0
-00013  C010  A9 18                 LDA #$18
-00014  C012  8D 02 D0              STA $D002    ; SPRITE 1
-00015  C015  A9 48                 LDA #$48
-00016  C017  8D 04 D0              STA $D004    ; SPRITE 2
-00017  C01A             
-00018  C01A                        ; SET Y
-00019  C01A  A9 99                 LDA #$99
-00020  C01C  8D 01 D0              STA $D001    ; SPRITE 0
-00021  C01F  A9 08                 LDA #$08
-00022  C021  8D 03 D0              STA $D003    ; SPRITE 1
-00023  C024  8D 05 D0              STA $D005    ; SPRITE 2
-00024  C027             
-00025  C027                        ; SET COLOR
-00026  C027  A9 01                 LDA #$01
-00027  C029  8D 27 D0              STA $D027    ; SPRITE 0
-00028  C02C  A9 0E                 LDA #$0E
-00029  C02E  8D 28 D0              STA $D028    ; SPRITE 1
-00030  C031  8D 29 D0              STA $D029    ; SPRITE 2
-00031  C034             
-00032  C034                        ; DOUBLE SIZE
-00033  C034  A9 FF                 LDA #$FF
-00034  C036  8D 17 D0              STA $D017
-00035  C039  8D 1D D0              STA $D01D
-00036  C03C             
-00037  C03C                        ; FILL SPRITE DATA
-00038  C03C  A9 FF                 LDA #$FF
-00039  C03E  A2 3F                 LDX #$3F
-00040  C040             LOOP       
-00041  C040  CA                    DEX
-00042  C041  9D 40 03              STA $0340,X
-00043  C044  D0 FA                 BNE LOOP
-00044  C046             
-00045  C046                        ; ENABLE ALL SPRITES
-00046  C046  A9 FF                 LDA #$FF
-00047  C048  8D 15 D0              STA $D015
-00048  C04B             
-00049  C04B  78                    SEI         ; IGNORE INTERRUPTS
-00050  C04C             
-00051  C04C                        ; DISABLE ALL INTERRUPTS AND CLEAR PENDING INTERRUPTS
-00052  C04C  A9 3F                 LDA #%0111111
-00053  C04E  8D 0D DC              STA $DC0D ; INTERRUPT CONTROL REGISTER CIA #1
-00054  C051  8D 0D DD              STA $DD0D ; INTERRUPT CONTROL REGISTER CIA#2
-00055  C054             
-00056  C054  AD 0D DC              LDA $DC0D   ;CLEAR ANY PENDING INTERRUPTS CIA#1 BY READING
-00057  C057  AD 0D DD              LDA $DD0D    ; CLEAR ANY PENDING INTERRUPTS CIA#2 BY READING
-00058  C05A             
-00059  C05A                        ; ENABLE RASTER INTERRUPT
-00060  C05A  A9 01                 LDA #%00000001   ;TURN ON THE RASTER INTERRUPT
-00061  C05C  8D 1A D0              STA $D01A  ; IRQ MASK REGISTER
-00062  C05F             
-00063  C05F                        ; SETTING THE INTERRUPT LINE
-00064  C05F  A0 33                 LDY #$33   ;GENERATE INTERRUPT ON FIRST LINE ON MAIN SCREEN AREA
-00065  C061  8C 12 D0              STY $D012  ; WRITE: LINE TO COMPARE FOR RASTER INTERRUPT
-00066  C064  A9 1B                 LDA #$1B  ;CLEAR HIGH ORDER BIT OF THE RASTER INTERRUPT COMPARE. VERY NAIVE
-00067  C066  8D 11 D0              STA $D011
-00068  C069             
-00069  C069                        ; SET THE INTERRUPT VECTOR
-00070  C069  A9 75                 LDA #<25ROWS  ;SET THE CORRECT ADDRESS FOR THE INTERRUPT
-00071  C06B  8D 14 03              STA $0314
-00072  C06E  A9 C0                 LDA #>25ROWS
-00073  C070  8D 15 03              STA $0315
-00074  C073             
-00075  C073  58                    CLI      ; ENABLE INTERRUPTS
-00076  C074  60                    RTS
-00077  C075             
-00078  C075             25ROWS
-00079  C075             
-00080  C075                        ; SET TO 25 COLUMN MODE
-00081  C075  AD 11 D0              LDA $D011
-00082  C078  09 08                 ORA #%00001000
-00083  C07A  8D 11 D0              STA $D011
-00084  C07D             
-00085  C07D                        ; REGISTER INTERRUPT FOR 24ROWS
-00086  C07D  A0 F9                 LDY #$F9     ; RASTERLINE
-00087  C07F  8C 12 D0              STY $D012
-00088  C082  A9 92                 LDA #<24ROWS ; VECTOR
-00089  C084  8D 14 03              STA $0314
-00090  C087  A9 C0                 LDA #>24ROWS
-00091  C089  8D 15 03              STA $0315
-00092  C08C             
-00093  C08C  0E 19 D0              ASL $D019 ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
-00094  C08F             
-00095  C08F  4C 31 EA              JMP $EA31 ; KERNEL ROUTINE INCLUDING SCANNING THE KEYBOARD
-00096  C092             
-00097  C092             24ROWS
-00098  C092             
-00099  C092                        ; SET TO 24 COLUMN MODE
-00100  C092  AD 11 D0              LDA $D011
-00101  C095  29 F7                 AND #%11110111
-00102  C097  8D 11 D0              STA $D011
-00103  C09A             
-00104  C09A                        ; REGISTER INTERRUPT FOR 25ROWS
-00105  C09A  A0 33                 LDY #$33     ; RASTERLINE
-00106  C09C  8C 12 D0              STY $D012
-00107  C09F  A9 75                 LDA #<25ROWS ; VECTOR
-00108  C0A1  8D 14 03              STA $0314
-00109  C0A4  A9 C0                 LDA #>25ROWS
-00110  C0A6  8D 15 03              STA $0315
-00111  C0A9             
-00112  C0A9  0E 19 D0              ASL $D019 ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
-00113  C0AC             
-00114  C0AC  4C 31 EA              JMP $EA31 ; KERNEL ROUTINE INCLUDING SCANNING THE KEYBOARD
-00115  C0AF             
-00116  C0AF             
-00117  C0AF             
-00118  C0AF             
-00119  C0AF             
-00120  C0AF             
-00121  C0AF             
-00122  C0AF             
-00123  C0AF             
-00124  C0AF             
-00125  C0AF             
-00126  C0AF             
+00009  C00B  8D FA 07              STA $07FA   ; SPRITE 3
+00010  C00E  8D FA 07              STA $07FA   ; SPRITE 4
+00011  C011  8D FA 07              STA $07FA   ; SPRITE 5
+00012  C014  8D FA 07              STA $07FA   ; SPRITE 6
+00013  C017  8D FA 07              STA $07FA   ; SPRITE 7
+00014  C01A             
+00015  C01A                        ; SET X
+00016  C01A  A9 99                 LDA #$99
+00017  C01C  8D 00 D0              STA $D000    ; SPRITE 0
+00018  C01F  A9 18                 LDA #$18
+00019  C021  8D 02 D0              STA $D002    ; SPRITE 1
+00020  C024  A9 48                 LDA #$48
+00021  C026  8D 04 D0              STA $D004    ; SPRITE 2
+00022  C029  A9 78                 LDA #$78
+00023  C02B  8D 06 D0              STA $D006    ; SPRITE 3
+00024  C02E  A9 A8                 LDA #$A8
+00025  C030  8D 08 D0              STA $D008    ; SPRITE 4
+00026  C033  A9 D8                 LDA #$D8
+00027  C035  8D 0A D0              STA $D00A    ; SPRITE 5
+00028  C038  A9 08                 LDA #$08
+00029  C03A  8D 0C D0              STA $D00C    ; SPRITE 6
+00030  C03D  A9 38                 LDA #$38
+00031  C03F  8D 0E D0              STA $D00E    ; SPRITE 7
+00032  C042             
+00033  C042                        ; SET MOST SIGNIFICANT BIT FOR LAST TWO SPRITES
+00034  C042  A9 C0                 LDA #$C0;
+00035  C044  8D 10 D0              STA $D010
+00036  C047             
+00037  C047                        ; SET Y
+00038  C047  A9 99                 LDA #$99
+00039  C049  8D 01 D0              STA $D001    ; SPRITE 0
+00040  C04C  A9 08                 LDA #$08
+00041  C04E  8D 03 D0              STA $D003    ; SPRITE 1
+00042  C051  8D 05 D0              STA $D005    ; SPRITE 2
+00043  C054  8D 07 D0              STA $D007    ; SPRITE 3
+00044  C057  8D 09 D0              STA $D009    ; SPRITE 4
+00045  C05A  8D 0B D0              STA $D00B    ; SPRITE 5
+00046  C05D  8D 0D D0              STA $D00D    ; SPRITE 6
+00047  C060  8D 0F D0              STA $D00F    ; SPRITE 7
+00048  C063             
+00049  C063                        ; SET COLOR
+00050  C063  A9 01                 LDA #$01
+00051  C065  8D 27 D0              STA $D027    ; SPRITE 0
+00052  C068  A9 0E                 LDA #$0E
+00053  C06A  8D 28 D0              STA $D028    ; SPRITE 1
+00054  C06D  8D 29 D0              STA $D029    ; SPRITE 2
+00055  C070  8D 2A D0              STA $D02A    ; SPRITE 3
+00056  C073  8D 2B D0              STA $D02B    ; SPRITE 4
+00057  C076  8D 2C D0              STA $D02C    ; SPRITE 5
+00058  C079  8D 2D D0              STA $D02D    ; SPRITE 5
+00059  C07C  8D 2E D0              STA $D02E    ; SPRITE 5
+00060  C07F             
+00061  C07F                        ; DOUBLE SIZE
+00062  C07F  A9 FF                 LDA #$FF
+00063  C081  8D 17 D0              STA $D017
+00064  C084  8D 1D D0              STA $D01D
+00065  C087             
+00066  C087                        ; FILL SPRITE DATA
+00067  C087  A9 FF                 LDA #$FF
+00068  C089  A2 3F                 LDX #$3F
+00069  C08B             LOOP       
+00070  C08B  CA                    DEX
+00071  C08C  9D 40 03              STA $0340,X
+00072  C08F  D0 FA                 BNE LOOP
+00073  C091             
+00074  C091                        ; ENABLE ALL SPRITES
+00075  C091  A9 FF                 LDA #$FF
+00076  C093  8D 15 D0              STA $D015
+00077  C096             
+00078  C096  78                    SEI         ; IGNORE INTERRUPTS
+00079  C097             
+00080  C097                        ; DISABLE ALL INTERRUPTS AND CLEAR PENDING INTERRUPTS
+00081  C097  A9 3F                 LDA #%0111111
+00082  C099  8D 0D DC              STA $DC0D ; INTERRUPT CONTROL REGISTER CIA #1
+00083  C09C  8D 0D DD              STA $DD0D ; INTERRUPT CONTROL REGISTER CIA#2
+00084  C09F             
+00085  C09F  AD 0D DC              LDA $DC0D   ;CLEAR ANY PENDING INTERRUPTS CIA#1 BY READING
+00086  C0A2  AD 0D DD              LDA $DD0D    ; CLEAR ANY PENDING INTERRUPTS CIA#2 BY READING
+00087  C0A5             
+00088  C0A5                        ; ENABLE RASTER INTERRUPT
+00089  C0A5  A9 01                 LDA #%00000001   ;TURN ON THE RASTER INTERRUPT
+00090  C0A7  8D 1A D0              STA $D01A  ; IRQ MASK REGISTER
+00091  C0AA             
+00092  C0AA                        ; SETTING THE INTERRUPT LINE
+00093  C0AA  A0 33                 LDY #$33   ;GENERATE INTERRUPT ON FIRST LINE ON MAIN SCREEN AREA
+00094  C0AC  8C 12 D0              STY $D012  ; WRITE: LINE TO COMPARE FOR RASTER INTERRUPT
+00095  C0AF  A9 1B                 LDA #$1B  ;CLEAR HIGH ORDER BIT OF THE RASTER INTERRUPT COMPARE. VERY NAIVE
+00096  C0B1  8D 11 D0              STA $D011
+00097  C0B4             
+00098  C0B4                        ; SET THE INTERRUPT VECTOR
+00099  C0B4  A9 C0                 LDA #<25ROWS  ;SET THE CORRECT ADDRESS FOR THE INTERRUPT
+00100  C0B6  8D 14 03              STA $0314
+00101  C0B9  A9 C0                 LDA #>25ROWS
+00102  C0BB  8D 15 03              STA $0315
+00103  C0BE             
+00104  C0BE  58                    CLI      ; ENABLE INTERRUPTS
+00105  C0BF  60                    RTS
+00106  C0C0             
+00107  C0C0             25ROWS
+00108  C0C0             
+00109  C0C0                        ; SET TO 25 COLUMN MODE
+00110  C0C0  AD 11 D0              LDA $D011
+00111  C0C3  09 08                 ORA #%00001000
+00112  C0C5  8D 11 D0              STA $D011
+00113  C0C8             
+00114  C0C8                        ; REGISTER INTERRUPT FOR 24ROWS
+00115  C0C8  A0 F9                 LDY #$F9     ; RASTERLINE
+00116  C0CA  8C 12 D0              STY $D012
+00117  C0CD  A9 DD                 LDA #<24ROWS ; VECTOR
+00118  C0CF  8D 14 03              STA $0314
+00119  C0D2  A9 C0                 LDA #>24ROWS
+00120  C0D4  8D 15 03              STA $0315
+00121  C0D7             
+00122  C0D7  0E 19 D0              ASL $D019 ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
+00123  C0DA             
+00124  C0DA  4C 31 EA              JMP $EA31 ; KERNEL ROUTINE INCLUDING SCANNING THE KEYBOARD
+00125  C0DD             
+00126  C0DD             24ROWS
+00127  C0DD             
+00128  C0DD                        ; SET TO 24 COLUMN MODE
+00129  C0DD  AD 11 D0              LDA $D011
+00130  C0E0  29 F7                 AND #%11110111
+00131  C0E2  8D 11 D0              STA $D011
+00132  C0E5             
+00133  C0E5                        ; REGISTER INTERRUPT FOR 25ROWS
+00134  C0E5  A0 33                 LDY #$33     ; RASTERLINE
+00135  C0E7  8C 12 D0              STY $D012
+00136  C0EA  A9 C0                 LDA #<25ROWS ; VECTOR
+00137  C0EC  8D 14 03              STA $0314
+00138  C0EF  A9 C0                 LDA #>25ROWS
+00139  C0F1  8D 15 03              STA $0315
+00140  C0F4             
+00141  C0F4  0E 19 D0              ASL $D019 ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
+00142  C0F7             
+00143  C0F7  4C 31 EA              JMP $EA31 ; KERNEL ROUTINE INCLUDING SCANNING THE KEYBOARD
+00144  C0FA             
+00145  C0FA             
+00146  C0FA             
+00147  C0FA             
+00148  C0FA             
+00149  C0FA             
+00150  C0FA             
+00151  C0FA             
+00152  C0FA             
+00153  C0FA             
+00154  C0FA             
+00155  C0FA             
 
 ******* 3 Label(s) *******
-24rows = $C092 
-25rows = $C075 
-loop = $C040 
+24rows = $C0DD 
+25rows = $C0C0 
+loop = $C08B 
 
 ******* 0 Unused label(s) *******
 
