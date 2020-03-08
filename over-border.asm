@@ -108,6 +108,11 @@ loop_sprite_data
 
 rasterline_000_00
 
+        ; set to 25 column mode
+        lda $d011     
+        ora #%00001000
+        sta $d011
+
         ; move sprite 0 vertically
         dec $d001     
 
@@ -133,21 +138,6 @@ rasterline_000_00
 
 rasterline_051_33
 
-        ; set to 25 column mode
-        lda $d011     
-        ora #%00001000
-        sta $d011     
-
-        ; put all sprites in the bottom border
-        lda #$fa      
-        sta $d003     ; sprite 1
-        sta $d005     ; sprite 2
-        sta $d007     ; sprite 3
-        sta $d009     ; sprite 4
-        sta $d00b     ; sprite 5
-        sta $d00d     ; sprite 6
-        sta $d00f     ; sprite 7
-
         ; register next raster
         ldy #$f9      ; rasterline
         sty $d012     
@@ -164,6 +154,16 @@ rasterline_249_f9
         lda $d011     
         and #%11110111
         sta $d011     
+
+        ; put all sprites in the bottom border
+        lda #$fa      
+        sta $d003     ; sprite 1
+        sta $d005     ; sprite 2
+        sta $d007     ; sprite 3
+        sta $d009     ; sprite 4
+        sta $d00b     ; sprite 5
+        sta $d00d     ; sprite 6
+        sta $d00f     ; sprite 7
 
         ; register next raster
         ldy #$00      ; rasterline
