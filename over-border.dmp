@@ -95,61 +95,93 @@
 00095  C0B1  8D 11 D0              STA $D011
 00096  C0B4             
 00097  C0B4                        ; SET THE INTERRUPT VECTOR
-00098  C0B4  A9 C0                 LDA #<25ROWS  ; SET THE CORRECT ADDRESS FOR THE INTERRUPT
+00098  C0B4  A9 EC                 LDA #<RASTERLINE_051_33  ; SET THE CORRECT ADDRESS FOR THE INTERRUPT
 00099  C0B6  8D 14 03              STA $0314
-00100  C0B9  A9 C0                 LDA #>25ROWS
+00100  C0B9  A9 C0                 LDA #>RASTERLINE_051_33
 00101  C0BB  8D 15 03              STA $0315
 00102  C0BE             
 00103  C0BE  58                    CLI           ; ENABLE INTERRUPTS
 00104  C0BF  60                    RTS
 00105  C0C0             
-00106  C0C0             25ROWS
-00107  C0C0                        ; SET TO 25 COLUMN MODE
-00108  C0C0  AD 11 D0              LDA $D011
-00109  C0C3  09 08                 ORA #%00001000
-00110  C0C5  8D 11 D0              STA $D011
-00111  C0C8             
-00112  C0C8                        ; REGISTER INTERRUPT FOR 24ROWS
-00113  C0C8  A0 F9                 LDY #$F9      ; RASTERLINE
-00114  C0CA  8C 12 D0              STY $D012
-00115  C0CD  A9 DD                 LDA #<24ROWS  ; VECTOR
-00116  C0CF  8D 14 03              STA $0314
-00117  C0D2  A9 C0                 LDA #>24ROWS
-00118  C0D4  8D 15 03              STA $0315
-00119  C0D7             
-00120  C0D7  0E 19 D0              ASL $D019     ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
-00121  C0DA             
-00122  C0DA  4C 31 EA              JMP $EA31     ; KERNEL ROUTINE INCLUDING SCANNING THE KEYBOARD
-00123  C0DD             
-00124  C0DD             24ROWS
-00125  C0DD                        ; SET TO 24 COLUMN MODE
-00126  C0DD  AD 11 D0              LDA $D011
-00127  C0E0  29 F7                 AND #%11110111
-00128  C0E2  8D 11 D0              STA $D011
-00129  C0E5             
-00130  C0E5                        ; REGISTER INTERRUPT FOR 25ROWS
-00131  C0E5  A0 33                 LDY #$33      ; RASTERLINE
-00132  C0E7  8C 12 D0              STY $D012
-00133  C0EA  A9 C0                 LDA #<25ROWS  ; VECTOR
-00134  C0EC  8D 14 03              STA $0314
-00135  C0EF  A9 C0                 LDA #>25ROWS
-00136  C0F1  8D 15 03              STA $0315
-00137  C0F4             
-00138  C0F4                        ; MOVE SPRITE 0 VERTICALLY
-00139  C0F4  CE 01 D0              DEC $D001
-00140  C0F7             
-00141  C0F7  0E 19 D0              ASL $D019     ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
-00142  C0FA             
-00143  C0FA  4C 31 EA              JMP $EA31     ; KERNEL ROUTINE INCLUDING SCANNING THE KEYBOARD
-00144  C0FD             
-00145  C0FD             
-00146  C0FD             
-00147  C0FD             
+00106  C0C0             RASTERLINE_000_00 
+00107  C0C0             
+00108  C0C0  A9 08                 LDA #$08
+00109  C0C2  8D 03 D0              STA $D003     ; SPRITE 1
+00110  C0C5  8D 05 D0              STA $D005     ; SPRITE 2
+00111  C0C8  8D 07 D0              STA $D007     ; SPRITE 3
+00112  C0CB  8D 09 D0              STA $D009     ; SPRITE 4
+00113  C0CE  8D 0B D0              STA $D00B     ; SPRITE 5
+00114  C0D1  8D 0D D0              STA $D00D     ; SPRITE 6
+00115  C0D4  8D 0F D0              STA $D00F     ; SPRITE 7
+00116  C0D7             
+00117  C0D7  A0 33                 LDY #$33      ; RASTERLINE
+00118  C0D9  8C 12 D0              STY $D012
+00119  C0DC  A9 EC                 LDA #<RASTERLINE_051_33  ; VECTOR
+00120  C0DE  8D 14 03              STA $0314
+00121  C0E1  A9 C0                 LDA #>RASTERLINE_051_33
+00122  C0E3  8D 15 03              STA $0315
+00123  C0E6             
+00124  C0E6  0E 19 D0              ASL $D019     ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
+00125  C0E9             
+00126  C0E9  4C 31 EA              JMP $EA31     ; KERNEL ROUTINE INCLUDING SCANNING THE KEYBOARD
+00127  C0EC             
+00128  C0EC             RASTERLINE_051_33 
+00129  C0EC                        ; SET TO 25 COLUMN MODE
+00130  C0EC  AD 11 D0              LDA $D011
+00131  C0EF  09 08                 ORA #%00001000
+00132  C0F1  8D 11 D0              STA $D011
+00133  C0F4             
+00134  C0F4                        ; SET Y
+00135  C0F4  A9 FA                 LDA #$FA
+00136  C0F6  8D 03 D0              STA $D003     ; SPRITE 1
+00137  C0F9  8D 05 D0              STA $D005     ; SPRITE 2
+00138  C0FC  8D 07 D0              STA $D007     ; SPRITE 3
+00139  C0FF  8D 09 D0              STA $D009     ; SPRITE 4
+00140  C102  8D 0B D0              STA $D00B     ; SPRITE 5
+00141  C105  8D 0D D0              STA $D00D     ; SPRITE 6
+00142  C108  8D 0F D0              STA $D00F     ; SPRITE 7
+00143  C10B             
+00144  C10B                        ; REGISTER INTERRUPT FOR 24ROWS
+00145  C10B  A0 F9                 LDY #$F9      ; RASTERLINE
+00146  C10D  8C 12 D0              STY $D012
+00147  C110  A9 20                 LDA #<RASTERLINE_249_F9  ; VECTOR
+00148  C112  8D 14 03              STA $0314
+00149  C115  A9 C1                 LDA #>RASTERLINE_249_F9
+00150  C117  8D 15 03              STA $0315
+00151  C11A             
+00152  C11A  0E 19 D0              ASL $D019     ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
+00153  C11D             
+00154  C11D  4C 31 EA              JMP $EA31     ; KERNEL ROUTINE INCLUDING SCANNING THE KEYBOARD
+00155  C120             
+00156  C120             RASTERLINE_249_F9 
+00157  C120             
+00158  C120                        ; SET TO 24 COLUMN MODE
+00159  C120  AD 11 D0              LDA $D011
+00160  C123  29 F7                 AND #%11110111
+00161  C125  8D 11 D0              STA $D011
+00162  C128             
+00163  C128                        ; REGISTER INTERRUPT FOR 25ROWS
+00164  C128  A0 00                 LDY #$00      ; RASTERLINE
+00165  C12A  8C 12 D0              STY $D012
+00166  C12D  A9 C0                 LDA #<RASTERLINE_000_00  ; VECTOR
+00167  C12F  8D 14 03              STA $0314
+00168  C132  A9 C0                 LDA #>RASTERLINE_000_00
+00169  C134  8D 15 03              STA $0315
+00170  C137             
+00171  C137                        ; MOVE SPRITE 0 VERTICALLY
+00172  C137  CE 01 D0              DEC $D001
+00173  C13A             
+00174  C13A  0E 19 D0              ASL $D019     ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
+00175  C13D             
+00176  C13D  4C 31 EA              JMP $EA31     ; KERNEL ROUTINE INCLUDING SCANNING THE KEYBOARD
+00177  C140             
+00178  C140             
 
-******* 3 Label(s) *******
-24rows = $C0DD 
-25rows = $C0C0 
+******* 4 Label(s) *******
 loop = $C08B 
+rasterline_000_00 = $C0C0 
+rasterline_051_33 = $C0EC 
+rasterline_249_f9 = $C120 
 
 ******* 0 Unused label(s) *******
 

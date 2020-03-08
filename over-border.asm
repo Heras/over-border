@@ -95,44 +95,77 @@ loop
         sta $d011     
 
         ; set the interrupt vector
-        lda #<25rows  ; set the correct address for the interrupt
+        lda #<rasterline_051_33  ; set the correct address for the interrupt
         sta $0314     
-        lda #>25rows  
+        lda #>rasterline_051_33  
         sta $0315     
 
         cli           ; enable interrupts
         rts
 
-25rows
-        ; set to 25 column mode
-        lda $d011     
-        ora #%00001000
-        sta $d011     
+rasterline_000_00
 
-                      ; register interrupt for 24rows
-        ldy #$f9      ; rasterline
+        lda #$08      
+        sta $d003     ; sprite 1
+        sta $d005     ; sprite 2
+        sta $d007     ; sprite 3
+        sta $d009     ; sprite 4
+        sta $d00b     ; sprite 5
+        sta $d00d     ; sprite 6
+        sta $d00f     ; sprite 7
+
+        ldy #$33      ; rasterline
         sty $d012     
-        lda #<24rows  ; vector
+        lda #<rasterline_051_33  ; vector
         sta $0314     
-        lda #>24rows  
+        lda #>rasterline_051_33  
         sta $0315     
 
         asl $d019     ; Acknowledge interrupt by clearing VICs interrupt flag
 
         jmp $ea31     ; Kernel routine including scanning the keyboard
 
-24rows
+rasterline_051_33
+        ; set to 25 column mode
+        lda $d011     
+        ora #%00001000
+        sta $d011     
+
+        ; set y
+        lda #$fa      
+        sta $d003     ; sprite 1
+        sta $d005     ; sprite 2
+        sta $d007     ; sprite 3
+        sta $d009     ; sprite 4
+        sta $d00b     ; sprite 5
+        sta $d00d     ; sprite 6
+        sta $d00f     ; sprite 7
+
+        ; register interrupt for 24rows
+        ldy #$f9      ; rasterline
+        sty $d012     
+        lda #<rasterline_249_f9  ; vector
+        sta $0314     
+        lda #>rasterline_249_f9  
+        sta $0315     
+
+        asl $d019     ; Acknowledge interrupt by clearing VICs interrupt flag
+
+        jmp $ea31     ; Kernel routine including scanning the keyboard
+
+rasterline_249_f9
+
         ; set to 24 column mode
         lda $d011     
         and #%11110111
         sta $d011     
 
         ; register interrupt for 25rows
-        ldy #$33      ; rasterline
+        ldy #$00      ; rasterline
         sty $d012     
-        lda #<25rows  ; vector
+        lda #<rasterline_000_00  ; vector
         sta $0314     
-        lda #>25rows  
+        lda #>rasterline_000_00  
         sta $0315     
 
         ; move sprite 0 vertically
@@ -141,6 +174,4 @@ loop
         asl $d019     ; Acknowledge interrupt by clearing VICs interrupt flag
 
         jmp $ea31     ; Kernel routine including scanning the keyboard
-
-
 
