@@ -108,6 +108,9 @@ loop_sprite_data
 
 rasterline_000_00
 
+        ; move sprite 0 vertically
+        dec $d001     
+
         ; put all sprites in the top border
         lda #$08      
         sta $d003     ; sprite 1
@@ -118,18 +121,18 @@ rasterline_000_00
         sta $d00d     ; sprite 6
         sta $d00f     ; sprite 7
 
+        ; register next raster
         ldy #$33      ; rasterline
         sty $d012     
         lda #<rasterline_051_33  ; vector
         sta $0314     
         lda #>rasterline_051_33  
         sta $0315     
-
         asl $d019     ; Acknowledge interrupt by clearing VICs interrupt flag
-
         jmp $ea31     ; Kernel routine including scanning the keyboard
 
 rasterline_051_33
+
         ; set to 25 column mode
         lda $d011     
         ora #%00001000
@@ -145,16 +148,14 @@ rasterline_051_33
         sta $d00d     ; sprite 6
         sta $d00f     ; sprite 7
 
-        ; register interrupt for 24rows
+        ; register next raster
         ldy #$f9      ; rasterline
         sty $d012     
         lda #<rasterline_249_f9  ; vector
         sta $0314     
         lda #>rasterline_249_f9  
         sta $0315     
-
         asl $d019     ; Acknowledge interrupt by clearing VICs interrupt flag
-
         jmp $ea31     ; Kernel routine including scanning the keyboard
 
 rasterline_249_f9
@@ -164,18 +165,13 @@ rasterline_249_f9
         and #%11110111
         sta $d011     
 
-        ; register interrupt for 25rows
+        ; register next raster
         ldy #$00      ; rasterline
         sty $d012     
         lda #<rasterline_000_00  ; vector
         sta $0314     
         lda #>rasterline_000_00  
         sta $0315     
-
-        ; move sprite 0 vertically
-        dec $d001     
-
         asl $d019     ; Acknowledge interrupt by clearing VICs interrupt flag
-
         jmp $ea31     ; Kernel routine including scanning the keyboard
 
