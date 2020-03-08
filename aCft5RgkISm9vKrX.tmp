@@ -2,16 +2,55 @@
 
 *=$c000                 ; 49152
 
+        jsr initialize_sprites
+        jsr initialize_raster_interrupts
+        rts
+
+
+
+initialize_raster_interrupts
+
+        sei           ; ignore all interrupts
+
+        ; disable all interrupts and clear pending interrupts
+        lda #%0111111 
+        sta $dc0d     ; interrupt control register CIA #1
+        sta $dd0d     ; interrupt control register CIA#2
+
+        lda $dc0d     ;clear any pending interrupts CIA#1 by reading
+        lda $dd0d     ; clear any pending interrupts CIA#2 by reading
+
+        ; enable raster interrupt
+        lda #%00000001;turn on the raster interrupt
+        sta $d01a     ; irq mask register
+
+        ; setting the interrupt line
+        ldy #$33      ; generate interrupt on first line on main screen area
+        sty $d012     ; write: line to compare for raster interrupt
+        lda #$1b      ; clear high order bit of the raster interrupt compare. very naive
+        sta $d011     
+
+        ; set the interrupt vector
+        lda #<rasterline_051_33  ; set the correct address for the interrupt
+        sta $0314     
+        lda #>rasterline_051_33  
+        sta $0315     
+
+        cli           ; enable interrupts
+        rts
+
+initialize_sprites
+
         ; set sprite location to 832
         lda #$0d      
         sta $07f8     ; sprite 0
         sta $07f9     ; sprite 1
         sta $07fa     ; sprite 2
-        sta $07fa     ; sprite 3
-        sta $07fa     ; sprite 4
-        sta $07fa     ; sprite 5
-        sta $07fa     ; sprite 6
-        sta $07fa     ; sprite 7
+        sta $07fb     ; sprite 3
+        sta $07fc     ; sprite 4
+        sta $07fd     ; sprite 5
+        sta $07fe     ; sprite 6
+        sta $07ff     ; sprite 7
 
         ; set x
         lda #$99      
@@ -67,42 +106,15 @@
         ; fill sprite data
         lda #$ff      
         ldx #$3f      
-loop
+loop_sprite_data
         DEX
         STA $0340,X   
-        bne loop      
+        bne loop_sprite_data      
 
         ; enable all sprites
         lda #$ff      
-        sta $d015     
+        sta $d015  
 
-        sei           ; ignore interrupts
-
-        ; disable all interrupts and clear pending interrupts
-        lda #%0111111 
-        sta $dc0d     ; interrupt control register CIA #1
-        sta $dd0d     ; interrupt control register CIA#2
-
-        lda $dc0d     ;clear any pending interrupts CIA#1 by reading
-        lda $dd0d     ; clear any pending interrupts CIA#2 by reading
-
-        ; enable raster interrupt
-        lda #%00000001;turn on the raster interrupt
-        sta $d01a     ; irq mask register
-
-        ; setting the interrupt line
-        ldy #$33      ; generate interrupt on first line on main screen area
-        sty $d012     ; write: line to compare for raster interrupt
-        lda #$1b      ; clear high order bit of the raster interrupt compare. very naive
-        sta $d011     
-
-        ; set the interrupt vector
-        lda #<rasterline_051_33  ; set the correct address for the interrupt
-        sta $0314     
-        lda #>rasterline_051_33  
-        sta $0315     
-
-        cli           ; enable interrupts
         rts
 
 rasterline_000_00
