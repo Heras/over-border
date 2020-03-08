@@ -27,9 +27,9 @@ initialize_raster_interrupts
         sta 53265     
 
         ; set the interrupt vector
-        lda #<rasterline_000_00  ; set the correct address for the interrupt
+        lda #<rasterline_000  ; set the correct address for the interrupt
         sta 788     
-        lda #>rasterline_000_00  
+        lda #>rasterline_000  
         sta 789     
 
         cli           ; enable interrupts
@@ -38,128 +38,129 @@ initialize_raster_interrupts
 initialize_sprites
 
         ; set sprite location to 832
-        lda #$0d      
-        sta $07f8     ; sprite 0
-        sta $07f9     ; sprite 1
-        sta $07fa     ; sprite 2
-        sta $07fb     ; sprite 3
-        sta $07fc     ; sprite 4
-        sta $07fd     ; sprite 5
-        sta $07fe     ; sprite 6
-        sta $07ff     ; sprite 7
+        lda #13       ; 13 x 64 = 832      
+        sta 2040     ; sprite 0
+        sta 2041     ; sprite 1
+        sta 2042     ; sprite 2
+        sta 2043     ; sprite 3
+        sta 2044     ; sprite 4
+        sta 2045     ; sprite 5
+        sta 2046     ; sprite 6
+        sta 2047     ; sprite 7
 
         ; set x
-        lda #$99      
-        sta $d000     ; sprite 0
-        lda #$18      
-        sta $d002     ; sprite 1
-        lda #$48      
-        sta $d004     ; sprite 2
-        lda #$78      
-        sta $d006     ; sprite 3
-        lda #$a8      
-        sta $d008     ; sprite 4
-        lda #$d8      
-        sta $d00a     ; sprite 5
-        lda #$08      
-        sta $d00c     ; sprite 6
-        lda #$38      
-        sta $d00e     ; sprite 7
+        lda #153      
+        sta 53248     ; sprite 0
+        lda #24      
+        sta 53250     ; sprite 1
+        lda #72      
+        sta 53252     ; sprite 2
+        lda #120      
+        sta 53254     ; sprite 3
+        lda #168      
+        sta 53256     ; sprite 4
+        lda #216      
+        sta 53258     ; sprite 5
 
         ; set most significant bit for last two sprites
-        lda #$c0
-        sta $d010     
+        lda #192
+        sta 53264     
+
+        lda #8      
+        sta 53260     ; sprite 6
+        lda #56      
+        sta 53262     ; sprite 7
 
         ; set y
-        lda #$99      
-        sta $d001     ; sprite 0
+        lda #153      
+        sta 53249     ; sprite 0
         ; raster interrupts will set y of the border sprites
 
         ; set color
-        lda #$01      
-        sta $D027     ; sprite 0
-        lda #$0e      
-        sta $D028     ; sprite 1
-        sta $D029     ; sprite 2
-        sta $D02a     ; sprite 3
-        sta $D02b     ; sprite 4
-        sta $D02c     ; sprite 5
-        sta $D02d     ; sprite 5
-        sta $D02e     ; sprite 5
+        lda #1      
+        sta 53287     ; sprite 0
+        lda #14      
+        sta 53288     ; sprite 1
+        sta 53289     ; sprite 2
+        sta 53290     ; sprite 3
+        sta 53291     ; sprite 4
+        sta 53292     ; sprite 5
+        sta 53293     ; sprite 5
+        sta 53294     ; sprite 5
 
         ; double size
-        lda #$ff      
-        sta $d017     
-        sta $d01d     
+        lda #255      
+        sta 53271     
+        sta 53277     
 
         ; fill sprite data
-        lda #$ff      
-        ldx #$3f      
+        lda #255      
+        ldx #63      
 loop_sprite_data
         DEX
-        STA $0340,X   
+        STA 832,X   
         bne loop_sprite_data      
 
         ; enable all sprites
-        lda #$ff      
-        sta $d015  
+        lda #255      
+        sta 53269  
 
         rts
 
-rasterline_000_00
+rasterline_000
 
         ; put all sprites in the top border
-        lda #$08      
-        sta $d003     ; sprite 1
-        sta $d005     ; sprite 2
-        sta $d007     ; sprite 3
-        sta $d009     ; sprite 4
-        sta $d00b     ; sprite 5
-        sta $d00d     ; sprite 6
-        sta $d00f     ; sprite 7
+        lda #8      
+        sta 53251     ; sprite 1
+        sta 53253     ; sprite 2
+        sta 53255     ; sprite 3
+        sta 53257     ; sprite 4
+        sta 53259     ; sprite 5
+        sta 53261     ; sprite 6
+        sta 53263     ; sprite 7
 
         ; set to 25 column mode
-        lda $d011     
+        lda 53265     
         ora #%00001000
-        sta $d011
+        sta 53265
 
         ; move sprite 0 vertically
-        dec $d001     
+        dec 53249     
 
         ; register next raster
         ldy #249      ; rasterline
         sty 53266   
-        lda #<rasterline_249_f9  ; vector
-        sta $0314     
-        lda #>rasterline_249_f9  
-        sta $0315     
-        asl $d019     ; Acknowledge interrupt by clearing VICs interrupt flag
-        jmp $ea31     ; Kernel routine including scanning the keyboard
+        lda #<rasterline_249  ; vector
+        sta 788     
+        lda #>rasterline_249  
+        sta 789     
+        asl 53273     ; Acknowledge interrupt by clearing VICs interrupt flag
+        jmp 59953     ; Kernel routine including scanning the keyboard
 
-rasterline_249_f9
+rasterline_249
 
         ; put all sprites in the bottom border
-        lda #$fa      
-        sta $d003     ; sprite 1
-        sta $d005     ; sprite 2
-        sta $d007     ; sprite 3
-        sta $d009     ; sprite 4
-        sta $d00b     ; sprite 5
-        sta $d00d     ; sprite 6
-        sta $d00f     ; sprite 7
+        lda #250
+        sta 53251     ; sprite 1
+        sta 53253     ; sprite 2
+        sta 53255     ; sprite 3
+        sta 53257     ; sprite 4
+        sta 53259     ; sprite 5
+        sta 53261     ; sprite 6
+        sta 53263     ; sprite 7
 
         ; set to 24 column mode
-        lda $d011     
+        lda 53265     
         and #%11110111
-        sta $d011     
+        sta 53265     
 
         ; register next raster
-        ldy #$00      ; rasterline
-        sty $d012     
-        lda #<rasterline_000_00  ; vector
-        sta $0314     
-        lda #>rasterline_000_00  
-        sta $0315     
-        asl $d019     ; Acknowledge interrupt by clearing VICs interrupt flag
-        jmp $ea31     ; Kernel routine including scanning the keyboard
+        ldy #00      ; rasterline
+        sty 53266     
+        lda #<rasterline_000  ; vector
+        sta 788     
+        lda #>rasterline_000 
+        sta 789     
+        asl 53273     ; Acknowledge interrupt by clearing VICs interrupt flag
+        jmp 59953     ; Kernel routine including scanning the keyboard
 
