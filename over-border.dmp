@@ -1,211 +1,216 @@
-00001  0000             *=49152
-00002  C000             
-00003  C000  20 31 C0              JSR INITIALIZE_SPRITES
-00004  C003  20 07 C0              JSR INITIALIZE_RASTER_INTERRUPTS
-00005  C006  60                    RTS
-00006  C007             
-00007  C007             INITIALIZE_RASTER_INTERRUPTS 
-00008  C007             
-00009  C007  78                    SEI           ; IGNORE ALL INTERRUPTS
-00010  C008             
-00011  C008                        ; DISABLE ALL INTERRUPTS AND CLEAR PENDING INTERRUPTS
-00012  C008  A9 3F                 LDA #%0111111
-00013  C00A  8D 0D DC              STA 56333     ; INTERRUPT CONTROL REGISTER CIA #1
-00014  C00D  8D 0D DD              STA 56589     ; INTERRUPT CONTROL REGISTER CIA#2
-00015  C010             
-00016  C010  AD 0D DC              LDA 56333     ;CLEAR ANY PENDING INTERRUPTS CIA#1 BY READING
-00017  C013  AD 0D DD              LDA 56589     ; CLEAR ANY PENDING INTERRUPTS CIA#2 BY READING
-00018  C016             
-00019  C016                        ; ENABLE RASTER INTERRUPT
-00020  C016  A9 01                 LDA #%00000001;TURN ON THE RASTER INTERRUPT
-00021  C018  8D 1A D0              STA 53274     ; IRQ MASK REGISTER
-00022  C01B             
-00023  C01B                        ; SETTING THE INTERRUPT LINE
-00024  C01B  A0 00                 LDY #00      ; GENERATE INTERRUPT ON FIRST LINE ON MAIN SCREEN AREA
-00025  C01D  8C 12 D0              STY 53266     ; WRITE: LINE TO COMPARE FOR RASTER INTERRUPT
-00026  C020  A9 1B                 LDA #27      ; CLEAR HIGH ORDER BIT OF THE RASTER INTERRUPT COMPARE. VERY NAIVE
-00027  C022  8D 11 D0              STA 53265
-00028  C025             
-00029  C025                        ; SET THE INTERRUPT VECTOR
-00030  C025  A9 47                 LDA #<RASTERLINE_000  ; SET THE CORRECT ADDRESS FOR THE INTERRUPT
-00031  C027  8D 14 03              STA 788
-00032  C02A  A9 C0                 LDA #>RASTERLINE_000
-00033  C02C  8D 15 03              STA 789
-00034  C02F             
-00035  C02F  58                    CLI           ; ENABLE INTERRUPTS
-00036  C030  60                    RTS
-00037  C031             
-00038  C031             INITIALIZE_SPRITES 
-00039  C031             
-00040  C031  20 E6 C0              JSR SET_SPRITE_DATA_LOCATION
-00041  C034  20 27 C1              JSR SET_SPRITE_DATA
-00042  C037  20 B8 C0              JSR SET_SPRITE_X_POSITION
-00043  C03A  20 B2 C0              JSR SET_SPRITE_Y_POSITION
-00044  C03D  20 01 C1              JSR SET_SPRITE_COLORS
-00045  C040  20 1E C1              JSR SET_SPRITE_DOUBLE_SIZE
-00046  C043  20 32 C1              JSR SET_SPRITE_ENABLED
-00047  C046  60                    RTS
-00048  C047             
-00049  C047             RASTERLINE_000 
-00050  C047             
-00051  C047                        ; PUT ALL SPRITES IN THE TOP BORDER
-00052  C047  A9 08                 LDA #8
-00053  C049  8D 03 D0              STA 53251     ; SPRITE 1
-00054  C04C  8D 05 D0              STA 53253     ; SPRITE 2
-00055  C04F  8D 07 D0              STA 53255     ; SPRITE 3
-00056  C052  8D 09 D0              STA 53257     ; SPRITE 4
-00057  C055  8D 0B D0              STA 53259     ; SPRITE 5
-00058  C058  8D 0D D0              STA 53261     ; SPRITE 6
-00059  C05B  8D 0F D0              STA 53263     ; SPRITE 7
-00060  C05E             
-00061  C05E                        ; SET TO 25 COLUMN MODE
-00062  C05E  AD 11 D0              LDA 53265
-00063  C061  09 08                 ORA #%00001000
-00064  C063  8D 11 D0              STA 53265
-00065  C066             
-00066  C066                        ; MOVE SPRITE 0 VERTICALLY
-00067  C066  CE 01 D0              DEC 53249
-00068  C069             
-00069  C069                        ; REGISTER NEXT RASTER
-00070  C069  A0 F9                 LDY #249      ; RASTERLINE
-00071  C06B  8C 12 D0              STY 53266
-00072  C06E  A9 7E                 LDA #<RASTERLINE_249  ; VECTOR
-00073  C070  8D 14 03              STA 788
-00074  C073  A9 C0                 LDA #>RASTERLINE_249
-00075  C075  8D 15 03              STA 789
-00076  C078  0E 19 D0              ASL 53273     ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
-00077  C07B  4C 31 EA              JMP 59953     ; KERNEL ROUTINE INCLUDING SCANNING THE KEYBOARD
-00078  C07E             
-00079  C07E             RASTERLINE_249 
-00080  C07E             
-00081  C07E                        ; PUT ALL SPRITES IN THE BOTTOM BORDER
-00082  C07E  A9 FA                 LDA #250
-00083  C080  8D 03 D0              STA 53251     ; SPRITE 1
-00084  C083  8D 05 D0              STA 53253     ; SPRITE 2
-00085  C086  8D 07 D0              STA 53255     ; SPRITE 3
-00086  C089  8D 09 D0              STA 53257     ; SPRITE 4
-00087  C08C  8D 0B D0              STA 53259     ; SPRITE 5
-00088  C08F  8D 0D D0              STA 53261     ; SPRITE 6
-00089  C092  8D 0F D0              STA 53263     ; SPRITE 7
-00090  C095             
-00091  C095                        ; SET TO 24 COLUMN MODE
-00092  C095  AD 11 D0              LDA 53265
-00093  C098  29 F7                 AND #%11110111
-00094  C09A  8D 11 D0              STA 53265
-00095  C09D             
-00096  C09D                        ; REGISTER NEXT RASTER
-00097  C09D  A0 00                 LDY #00      ; RASTERLINE
-00098  C09F  8C 12 D0              STY 53266
-00099  C0A2  A9 47                 LDA #<RASTERLINE_000  ; VECTOR
-00100  C0A4  8D 14 03              STA 788
-00101  C0A7  A9 C0                 LDA #>RASTERLINE_000
-00102  C0A9  8D 15 03              STA 789
-00103  C0AC  0E 19 D0              ASL 53273     ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
-00104  C0AF  4C 31 EA              JMP 59953     ; KERNEL ROUTINE INCLUDING SCANNING THE KEYBOARD
-00105  C0B2             
-00106  C0B2             SET_SPRITE_Y_POSITION 
-00107  C0B2             
-00108  C0B2  A9 99                 LDA #153
-00109  C0B4  8D 01 D0              STA 53249     ; SPRITE 0
-00110  C0B7                        ; RASTER INTERRUPTS WILL SET Y OF THE BORDER SPRITES
-00111  C0B7  60                    RTS
-00112  C0B8             
-00113  C0B8             SET_SPRITE_X_POSITION 
-00114  C0B8             
-00115  C0B8  A9 99                 LDA #153
-00116  C0BA  8D 00 D0              STA 53248     ; SPRITE 0
-00117  C0BD  A9 18                 LDA #24
-00118  C0BF  8D 02 D0              STA 53250     ; SPRITE 1
-00119  C0C2  A9 48                 LDA #72
-00120  C0C4  8D 04 D0              STA 53252     ; SPRITE 2
-00121  C0C7  A9 78                 LDA #120
-00122  C0C9  8D 06 D0              STA 53254     ; SPRITE 3
-00123  C0CC  A9 A8                 LDA #168
-00124  C0CE  8D 08 D0              STA 53256     ; SPRITE 4
-00125  C0D1  A9 D8                 LDA #216
-00126  C0D3  8D 0A D0              STA 53258     ; SPRITE 5
-00127  C0D6             
-00128  C0D6                        ; SET MOST SIGNIFICANT BIT FOR LAST TWO SPRITES
-00129  C0D6  A9 C0                 LDA #192
-00130  C0D8  8D 10 D0              STA 53264
-00131  C0DB             
-00132  C0DB  A9 08                 LDA #8
-00133  C0DD  8D 0C D0              STA 53260     ; SPRITE 6
-00134  C0E0  A9 38                 LDA #56
-00135  C0E2  8D 0E D0              STA 53262     ; SPRITE 7
-00136  C0E5  60                    RTS
-00137  C0E6             
-00138  C0E6             SET_SPRITE_DATA_LOCATION 
-00139  C0E6  A9 0D                 LDA #13       ; 13 X 64 = 832
-00140  C0E8  8D F8 07              STA 2040     ; SPRITE 0
-00141  C0EB  8D F9 07              STA 2041     ; SPRITE 1
-00142  C0EE  8D FA 07              STA 2042     ; SPRITE 2
-00143  C0F1  8D FB 07              STA 2043     ; SPRITE 3
-00144  C0F4  8D FC 07              STA 2044     ; SPRITE 4
-00145  C0F7  8D FD 07              STA 2045     ; SPRITE 5
-00146  C0FA  8D FE 07              STA 2046     ; SPRITE 6
-00147  C0FD  8D FF 07              STA 2047     ; SPRITE 7
-00148  C100  60                    RTS
-00149  C101             
-00150  C101             SET_SPRITE_COLORS 
-00151  C101             
-00152  C101  A9 01                 LDA #1
-00153  C103  8D 27 D0              STA 53287     ; SPRITE 0
-00154  C106  A9 0E                 LDA #14
-00155  C108  8D 28 D0              STA 53288     ; SPRITE 1
-00156  C10B  8D 29 D0              STA 53289     ; SPRITE 2
-00157  C10E  8D 2A D0              STA 53290     ; SPRITE 3
-00158  C111  8D 2B D0              STA 53291     ; SPRITE 4
-00159  C114  8D 2C D0              STA 53292     ; SPRITE 5
-00160  C117  8D 2D D0              STA 53293     ; SPRITE 5
-00161  C11A  8D 2E D0              STA 53294     ; SPRITE 5
-00162  C11D  60                    RTS
-00163  C11E             
-00164  C11E             SET_SPRITE_DOUBLE_SIZE 
-00165  C11E             
-00166  C11E  A9 FF                 LDA #255
-00167  C120  8D 17 D0              STA 53271
-00168  C123  8D 1D D0              STA 53277
-00169  C126  60                    RTS
-00170  C127             
-00171  C127             SET_SPRITE_DATA 
-00172  C127             
-00173  C127  A9 FF                 LDA #255
-00174  C129  A2 3F                 LDX #63
-00175  C12B             SET_SPRITE_DATA_LOOP 
-00176  C12B  CA                    DEX
-00177  C12C  9D 40 03              STA 832,X
-00178  C12F  D0 FA                 BNE SET_SPRITE_DATA_LOOP
-00179  C131  60                    RTS
-00180  C132             
-00181  C132             SET_SPRITE_ENABLED 
-00182  C132             
-00183  C132  A9 FF                 LDA #255
-00184  C134  8D 15 D0              STA 53269
-00185  C137  60                    RTS
-00186  C138             
-00187  C138             
+00001  0000             *=2049
+00002  0801             
+00003  0801  0B 08 0A              BYTE    $0B, $08, $0A, $00, $9E
+00004  0806  32 30 36              BYTE    '2', '0', '6', '1'
+00005  080A  00 00 00              BYTE    $00, $00, $00
+00006  080D             
+00007  080D             *=2061
+00008  080D             
+00009  080D  20 3E 08              JSR INITIALIZE_SPRITES
+00010  0810  20 14 08              JSR INITIALIZE_RASTER_INTERRUPTS
+00011  0813  60                    RTS
+00012  0814             
+00013  0814             INITIALIZE_RASTER_INTERRUPTS 
+00014  0814             
+00015  0814  78                    SEI           ; IGNORE ALL INTERRUPTS
+00016  0815             
+00017  0815                        ; DISABLE ALL INTERRUPTS AND CLEAR PENDING INTERRUPTS
+00018  0815  A9 3F                 LDA #%0111111
+00019  0817  8D 0D DC              STA 56333     ; INTERRUPT CONTROL REGISTER CIA #1
+00020  081A  8D 0D DD              STA 56589     ; INTERRUPT CONTROL REGISTER CIA#2
+00021  081D             
+00022  081D  AD 0D DC              LDA 56333     ;CLEAR ANY PENDING INTERRUPTS CIA#1 BY READING
+00023  0820  AD 0D DD              LDA 56589     ; CLEAR ANY PENDING INTERRUPTS CIA#2 BY READING
+00024  0823             
+00025  0823                        ; ENABLE RASTER INTERRUPT
+00026  0823  A9 01                 LDA #%00000001;TURN ON THE RASTER INTERRUPT
+00027  0825  8D 1A D0              STA 53274     ; IRQ MASK REGISTER
+00028  0828             
+00029  0828                        ; SETTING THE INTERRUPT LINE
+00030  0828  A0 00                 LDY #00      ; GENERATE INTERRUPT ON FIRST LINE ON MAIN SCREEN AREA
+00031  082A  8C 12 D0              STY 53266     ; WRITE: LINE TO COMPARE FOR RASTER INTERRUPT
+00032  082D  A9 1B                 LDA #27      ; CLEAR HIGH ORDER BIT OF THE RASTER INTERRUPT COMPARE. VERY NAIVE
+00033  082F  8D 11 D0              STA 53265
+00034  0832             
+00035  0832                        ; SET THE INTERRUPT VECTOR
+00036  0832  A9 54                 LDA #<RASTERLINE_000  ; SET THE CORRECT ADDRESS FOR THE INTERRUPT
+00037  0834  8D 14 03              STA 788
+00038  0837  A9 08                 LDA #>RASTERLINE_000
+00039  0839  8D 15 03              STA 789
+00040  083C             
+00041  083C  58                    CLI           ; ENABLE INTERRUPTS
+00042  083D  60                    RTS
+00043  083E             
+00044  083E             INITIALIZE_SPRITES 
+00045  083E             
+00046  083E  20 F3 08              JSR SET_SPRITE_DATA_LOCATION
+00047  0841  20 34 09              JSR SET_SPRITE_DATA
+00048  0844  20 C5 08              JSR SET_SPRITE_X_POSITION
+00049  0847  20 BF 08              JSR SET_SPRITE_Y_POSITION
+00050  084A  20 0E 09              JSR SET_SPRITE_COLORS
+00051  084D  20 2B 09              JSR SET_SPRITE_DOUBLE_SIZE
+00052  0850  20 3F 09              JSR SET_SPRITE_ENABLED
+00053  0853  60                    RTS
+00054  0854             
+00055  0854             RASTERLINE_000 
+00056  0854             
+00057  0854                        ; PUT ALL SPRITES IN THE TOP BORDER
+00058  0854  A9 08                 LDA #8
+00059  0856  8D 03 D0              STA 53251     ; SPRITE 1
+00060  0859  8D 05 D0              STA 53253     ; SPRITE 2
+00061  085C  8D 07 D0              STA 53255     ; SPRITE 3
+00062  085F  8D 09 D0              STA 53257     ; SPRITE 4
+00063  0862  8D 0B D0              STA 53259     ; SPRITE 5
+00064  0865  8D 0D D0              STA 53261     ; SPRITE 6
+00065  0868  8D 0F D0              STA 53263     ; SPRITE 7
+00066  086B             
+00067  086B                        ; SET TO 25 COLUMN MODE
+00068  086B  AD 11 D0              LDA 53265
+00069  086E  09 08                 ORA #%00001000
+00070  0870  8D 11 D0              STA 53265
+00071  0873             
+00072  0873                        ; MOVE SPRITE 0 VERTICALLY
+00073  0873  CE 01 D0              DEC 53249
+00074  0876             
+00075  0876                        ; REGISTER NEXT RASTER
+00076  0876  A0 F9                 LDY #249      ; RASTERLINE
+00077  0878  8C 12 D0              STY 53266
+00078  087B  A9 8B                 LDA #<RASTERLINE_249  ; VECTOR
+00079  087D  8D 14 03              STA 788
+00080  0880  A9 08                 LDA #>RASTERLINE_249
+00081  0882  8D 15 03              STA 789
+00082  0885  0E 19 D0              ASL 53273     ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
+00083  0888  4C 31 EA              JMP 59953     ; KERNEL ROUTINE INCLUDING SCANNING THE KEYBOARD
+00084  088B             
+00085  088B             RASTERLINE_249 
+00086  088B             
+00087  088B                        ; PUT ALL SPRITES IN THE BOTTOM BORDER
+00088  088B  A9 FA                 LDA #250
+00089  088D  8D 03 D0              STA 53251     ; SPRITE 1
+00090  0890  8D 05 D0              STA 53253     ; SPRITE 2
+00091  0893  8D 07 D0              STA 53255     ; SPRITE 3
+00092  0896  8D 09 D0              STA 53257     ; SPRITE 4
+00093  0899  8D 0B D0              STA 53259     ; SPRITE 5
+00094  089C  8D 0D D0              STA 53261     ; SPRITE 6
+00095  089F  8D 0F D0              STA 53263     ; SPRITE 7
+00096  08A2             
+00097  08A2                        ; SET TO 24 COLUMN MODE
+00098  08A2  AD 11 D0              LDA 53265
+00099  08A5  29 F7                 AND #%11110111
+00100  08A7  8D 11 D0              STA 53265
+00101  08AA             
+00102  08AA                        ; REGISTER NEXT RASTER
+00103  08AA  A0 00                 LDY #00      ; RASTERLINE
+00104  08AC  8C 12 D0              STY 53266
+00105  08AF  A9 54                 LDA #<RASTERLINE_000  ; VECTOR
+00106  08B1  8D 14 03              STA 788
+00107  08B4  A9 08                 LDA #>RASTERLINE_000
+00108  08B6  8D 15 03              STA 789
+00109  08B9  0E 19 D0              ASL 53273     ; ACKNOWLEDGE INTERRUPT BY CLEARING VICS INTERRUPT FLAG
+00110  08BC  4C 31 EA              JMP 59953     ; KERNEL ROUTINE INCLUDING SCANNING THE KEYBOARD
+00111  08BF             
+00112  08BF             SET_SPRITE_Y_POSITION 
+00113  08BF             
+00114  08BF  A9 99                 LDA #153
+00115  08C1  8D 01 D0              STA 53249     ; SPRITE 0
+00116  08C4                        ; RASTER INTERRUPTS WILL SET Y OF THE BORDER SPRITES
+00117  08C4  60                    RTS
+00118  08C5             
+00119  08C5             SET_SPRITE_X_POSITION 
+00120  08C5             
+00121  08C5  A9 99                 LDA #153
+00122  08C7  8D 00 D0              STA 53248     ; SPRITE 0
+00123  08CA  A9 18                 LDA #24
+00124  08CC  8D 02 D0              STA 53250     ; SPRITE 1
+00125  08CF  A9 48                 LDA #72
+00126  08D1  8D 04 D0              STA 53252     ; SPRITE 2
+00127  08D4  A9 78                 LDA #120
+00128  08D6  8D 06 D0              STA 53254     ; SPRITE 3
+00129  08D9  A9 A8                 LDA #168
+00130  08DB  8D 08 D0              STA 53256     ; SPRITE 4
+00131  08DE  A9 D8                 LDA #216
+00132  08E0  8D 0A D0              STA 53258     ; SPRITE 5
+00133  08E3             
+00134  08E3                        ; SET MOST SIGNIFICANT BIT FOR LAST TWO SPRITES
+00135  08E3  A9 C0                 LDA #192
+00136  08E5  8D 10 D0              STA 53264
+00137  08E8             
+00138  08E8  A9 08                 LDA #8
+00139  08EA  8D 0C D0              STA 53260     ; SPRITE 6
+00140  08ED  A9 38                 LDA #56
+00141  08EF  8D 0E D0              STA 53262     ; SPRITE 7
+00142  08F2  60                    RTS
+00143  08F3             
+00144  08F3             SET_SPRITE_DATA_LOCATION 
+00145  08F3  A9 0D                 LDA #13       ; 13 X 64 = 832
+00146  08F5  8D F8 07              STA 2040     ; SPRITE 0
+00147  08F8  8D F9 07              STA 2041     ; SPRITE 1
+00148  08FB  8D FA 07              STA 2042     ; SPRITE 2
+00149  08FE  8D FB 07              STA 2043     ; SPRITE 3
+00150  0901  8D FC 07              STA 2044     ; SPRITE 4
+00151  0904  8D FD 07              STA 2045     ; SPRITE 5
+00152  0907  8D FE 07              STA 2046     ; SPRITE 6
+00153  090A  8D FF 07              STA 2047     ; SPRITE 7
+00154  090D  60                    RTS
+00155  090E             
+00156  090E             SET_SPRITE_COLORS 
+00157  090E             
+00158  090E  A9 01                 LDA #1
+00159  0910  8D 27 D0              STA 53287     ; SPRITE 0
+00160  0913  A9 0E                 LDA #14
+00161  0915  8D 28 D0              STA 53288     ; SPRITE 1
+00162  0918  8D 29 D0              STA 53289     ; SPRITE 2
+00163  091B  8D 2A D0              STA 53290     ; SPRITE 3
+00164  091E  8D 2B D0              STA 53291     ; SPRITE 4
+00165  0921  8D 2C D0              STA 53292     ; SPRITE 5
+00166  0924  8D 2D D0              STA 53293     ; SPRITE 5
+00167  0927  8D 2E D0              STA 53294     ; SPRITE 5
+00168  092A  60                    RTS
+00169  092B             
+00170  092B             SET_SPRITE_DOUBLE_SIZE 
+00171  092B             
+00172  092B  A9 FF                 LDA #255
+00173  092D  8D 17 D0              STA 53271
+00174  0930  8D 1D D0              STA 53277
+00175  0933  60                    RTS
+00176  0934             
+00177  0934             SET_SPRITE_DATA 
+00178  0934             
+00179  0934  A9 FF                 LDA #255
+00180  0936  A2 3F                 LDX #63
+00181  0938  CA         @LOOP      DEX
+00182  0939  9D 40 03              STA 832,X
+00183  093C  D0 FA                 BNE @LOOP
+00184  093E  60                    RTS
+00185  093F             
+00186  093F             SET_SPRITE_ENABLED 
+00187  093F             
+00188  093F  A9 FF                 LDA #255
+00189  0941  8D 15 D0              STA 53269
+00190  0944  60                    RTS
+00191  0945             
+00192  0945             
 
-******* 12 Label(s) *******
-initialize_raster_interrupts = $C007 
-initialize_sprites = $C031 
-rasterline_000 = $C047 
-rasterline_249 = $C07E 
-set_sprite_colors = $C101 
-set_sprite_data = $C127 
-set_sprite_data_location = $C0E6 
-set_sprite_data_loop = $C12B 
-set_sprite_double_size = $C11E 
-set_sprite_enabled = $C132 
-set_sprite_x_position = $C0B8 
-set_sprite_y_position = $C0B2 
+******* 11 Label(s) *******
+initialize_raster_interrupts = $0814 
+initialize_sprites = $083E 
+rasterline_000 = $0854 
+rasterline_249 = $088B 
+set_sprite_colors = $090E 
+set_sprite_data = $0934 
+set_sprite_data_location = $08F3 
+set_sprite_double_size = $092B 
+set_sprite_enabled = $093F 
+set_sprite_x_position = $08C5 
+set_sprite_y_position = $08BF 
 
 ******* 2 Unused label(s) *******
+@loop
 initialize_raster_interrupts
 initialize_sprites
 
 ******* 1 Variable(s) *******
 tgt_c64  = $0001
-******* 1 Unused variables(s) *******
+******* 0 Unused variables(s) *******
 tgt_c64
 

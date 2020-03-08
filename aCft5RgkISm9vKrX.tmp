@@ -1,6 +1,12 @@
 ##{0:0:0:over-border.prg}C:\Users\joepg\OneDrive\c64\over-border\over-border\over-border.asm
 
-*=49152
+*=2049
+
+    byte    $0B, $08, $0A, $00, $9E
+    byte    '2', '0', '6', '1'
+    byte    $00, $00, $00
+
+*=2061
 
         jsr initialize_sprites
         jsr initialize_raster_interrupts
@@ -174,10 +180,9 @@ set_sprite_data
 
         lda #255      
         ldx #63      
-set_sprite_data_loop
-        dex
+@loop   dex
         sta 832,X   
-        bne set_sprite_data_loop      
+        bne @loop      
         rts
 
 set_sprite_enabled
