@@ -39,74 +39,13 @@ initialize_raster_interrupts
 
 initialize_sprites
 
-        ; set sprite location to 832
-        lda #13       ; 13 x 64 = 832      
-        sta 2040     ; sprite 0
-        sta 2041     ; sprite 1
-        sta 2042     ; sprite 2
-        sta 2043     ; sprite 3
-        sta 2044     ; sprite 4
-        sta 2045     ; sprite 5
-        sta 2046     ; sprite 6
-        sta 2047     ; sprite 7
-
-        ; set x
-        lda #153      
-        sta 53248     ; sprite 0
-        lda #24      
-        sta 53250     ; sprite 1
-        lda #72      
-        sta 53252     ; sprite 2
-        lda #120      
-        sta 53254     ; sprite 3
-        lda #168      
-        sta 53256     ; sprite 4
-        lda #216      
-        sta 53258     ; sprite 5
-
-        ; set most significant bit for last two sprites
-        lda #192
-        sta 53264     
-
-        lda #8      
-        sta 53260     ; sprite 6
-        lda #56      
-        sta 53262     ; sprite 7
-
-        ; set y
-        lda #153      
-        sta 53249     ; sprite 0
-        ; raster interrupts will set y of the border sprites
-
-        ; set color
-        lda #1      
-        sta 53287     ; sprite 0
-        lda #14      
-        sta 53288     ; sprite 1
-        sta 53289     ; sprite 2
-        sta 53290     ; sprite 3
-        sta 53291     ; sprite 4
-        sta 53292     ; sprite 5
-        sta 53293     ; sprite 5
-        sta 53294     ; sprite 5
-
-        ; double size
-        lda #255      
-        sta 53271     
-        sta 53277     
-
-        ; fill sprite data
-        lda #255      
-        ldx #63      
-loop_sprite_data
-        DEX
-        STA 832,X   
-        bne loop_sprite_data      
-
-        ; enable all sprites
-        lda #255      
-        sta 53269  
-
+        jsr set_sprite_data_location
+        jsr set_sprite_data
+        jsr set_sprite_x_position
+        jsr set_sprite_y_position
+        jsr set_sprite_colors
+        jsr set_sprite_double_size
+        jsr set_sprite_enabled
         rts
 
 rasterline_000
@@ -165,5 +104,86 @@ rasterline_249
         sta 789     
         asl 53273     ; Acknowledge interrupt by clearing VICs interrupt flag
         jmp 59953     ; Kernel routine including scanning the keyboard
+
+set_sprite_y_position
+
+        lda #153      
+        sta 53249     ; sprite 0
+        ; raster interrupts will set y of the border sprites
+        rts
+
+set_sprite_x_position
+
+        lda #153      
+        sta 53248     ; sprite 0
+        lda #24      
+        sta 53250     ; sprite 1
+        lda #72      
+        sta 53252     ; sprite 2
+        lda #120      
+        sta 53254     ; sprite 3
+        lda #168      
+        sta 53256     ; sprite 4
+        lda #216      
+        sta 53258     ; sprite 5
+
+        ; set most significant bit for last two sprites
+        lda #192
+        sta 53264     
+
+        lda #8      
+        sta 53260     ; sprite 6
+        lda #56      
+        sta 53262     ; sprite 7
+        rts
+
+set_sprite_data_location
+        lda #13       ; 13 x 64 = 832      
+        sta 2040     ; sprite 0
+        sta 2041     ; sprite 1
+        sta 2042     ; sprite 2
+        sta 2043     ; sprite 3
+        sta 2044     ; sprite 4
+        sta 2045     ; sprite 5
+        sta 2046     ; sprite 6
+        sta 2047     ; sprite 7
+        rts
+
+set_sprite_colors
+
+        lda #1      
+        sta 53287     ; sprite 0
+        lda #14      
+        sta 53288     ; sprite 1
+        sta 53289     ; sprite 2
+        sta 53290     ; sprite 3
+        sta 53291     ; sprite 4
+        sta 53292     ; sprite 5
+        sta 53293     ; sprite 5
+        sta 53294     ; sprite 5
+        rts
+
+set_sprite_double_size
+
+        lda #255      
+        sta 53271     
+        sta 53277     
+        rts
+
+set_sprite_data
+
+        lda #255      
+        ldx #63      
+set_sprite_data_loop
+        dex
+        sta 832,X   
+        bne set_sprite_data_loop      
+        rts
+
+set_sprite_enabled
+
+        lda #255      
+        sta 53269  
+        rts
 
 
