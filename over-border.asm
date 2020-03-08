@@ -4,8 +4,6 @@
         jsr initialize_raster_interrupts
         rts
 
-
-
 initialize_raster_interrupts
 
         sei           ; ignore all interrupts
@@ -75,14 +73,7 @@ initialize_sprites
         ; set y
         lda #$99      
         sta $d001     ; sprite 0
-        lda #$08      
-        sta $d003     ; sprite 1
-        sta $d005     ; sprite 2
-        sta $d007     ; sprite 3
-        sta $d009     ; sprite 4
-        sta $d00b     ; sprite 5
-        sta $d00d     ; sprite 6
-        sta $d00f     ; sprite 7
+        ; raster interrupts will set y of the border sprites
 
         ; set color
         lda #$01      
@@ -117,6 +108,7 @@ loop_sprite_data
 
 rasterline_000_00
 
+        ; put all sprites in the top border
         lda #$08      
         sta $d003     ; sprite 1
         sta $d005     ; sprite 2
@@ -143,7 +135,7 @@ rasterline_051_33
         ora #%00001000
         sta $d011     
 
-        ; set y
+        ; put all sprites in the bottom border
         lda #$fa      
         sta $d003     ; sprite 1
         sta $d005     ; sprite 2
