@@ -4,14 +4,18 @@
     ; set sprite location to 832
     lda #$0d
     sta $07f8
+    sta $07f9
 
     ; set x
     lda #$18
     sta $d000
+    lda #$44
+    sta $d002
 
     ; set y
     lda #$08
     sta $d001
+    sta $d003
 
     ; set color
     lda #$0e
@@ -24,7 +28,12 @@
 
     ; fill sprite data
 ;for n=0 to 62:poke832+n,255:next
-
+    lda #$ff
+    ldx #$3e
+loop    
+    STA $0340,X
+    DEX
+    bne loop    
 
     ; enable all sprites
     lda #$ff
